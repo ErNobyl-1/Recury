@@ -196,6 +196,7 @@ function formatInstance(instance: TaskInstance & { template: TaskTemplate }) {
       scheduleType: instance.template.scheduleType,
       dueTime: instance.template.dueTime,
       tags: instance.template.tags,
+      color: instance.template.color,
     },
   };
 }

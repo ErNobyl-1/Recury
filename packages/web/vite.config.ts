@@ -8,7 +8,15 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: [
+        'favicon.ico',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'favicon-96x96.png',
+        'apple-icon-*.png',
+        'android-icon-*.png',
+        'ms-icon-*.png',
+      ],
       manifest: {
         name: 'Recury',
         short_name: 'Recury',
@@ -19,18 +27,38 @@ export default defineConfig({
         orientation: 'portrait',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'android-icon-36x36.png',
+            sizes: '36x36',
+            type: 'image/png',
+          },
+          {
+            src: 'android-icon-48x48.png',
+            sizes: '48x48',
+            type: 'image/png',
+          },
+          {
+            src: 'android-icon-72x72.png',
+            sizes: '72x72',
+            type: 'image/png',
+          },
+          {
+            src: 'android-icon-96x96.png',
+            sizes: '96x96',
+            type: 'image/png',
+          },
+          {
+            src: 'android-icon-144x144.png',
+            sizes: '144x144',
+            type: 'image/png',
+          },
+          {
+            src: 'android-icon-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
+            src: 'ms-icon-310x310.png',
+            sizes: '310x310',
             type: 'image/png',
             purpose: 'any maskable',
           },

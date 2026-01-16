@@ -76,6 +76,7 @@ export interface Template {
   yearlyDay: number | null;
   dueTime: string | null;
   tags: string | null;
+  color: string | null;
   sortOrder: number;
 }
 
@@ -95,6 +96,7 @@ export interface CreateTemplateInput {
   yearlyDay?: number | null;
   dueTime?: string | null;
   tags?: string | null;
+  color?: string | null;
   sortOrder?: number;
 }
 
@@ -154,6 +156,7 @@ export interface Instance {
     scheduleType: string;
     dueTime?: string | null;
     tags?: string | null;
+    color?: string | null;
   };
 }
 

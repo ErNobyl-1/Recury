@@ -47,6 +47,20 @@ export default function TaskEditPage() {
   const [intervalUnit, setIntervalUnit] = useState<IntervalUnit>('WEEK');
   const [dueTime, setDueTime] = useState('');
   const [tags, setTags] = useState('');
+  const [color, setColor] = useState<string | null>(null);
+
+  // Predefined colors for quick selection
+  const PRESET_COLORS = [
+    { value: '#EF4444', label: 'Rot' },
+    { value: '#F97316', label: 'Orange' },
+    { value: '#EAB308', label: 'Gelb' },
+    { value: '#22C55E', label: 'Gr\u00fcn' },
+    { value: '#14B8A6', label: 'T\u00fcrkis' },
+    { value: '#3B82F6', label: 'Blau' },
+    { value: '#8B5CF6', label: 'Violett' },
+    { value: '#EC4899', label: 'Pink' },
+    { value: '#6B7280', label: 'Grau' },
+  ];
 
   useEffect(() => {
     if (!isNew && id) {
@@ -72,6 +86,7 @@ export default function TaskEditPage() {
       setIntervalUnit(template.intervalUnit || 'WEEK');
       setDueTime(template.dueTime || '');
       setTags(template.tags || '');
+      setColor(template.color || null);
     } catch (error) {
       console.error('Failed to load template:', error);
       setError('Aufgabe konnte nicht geladen werden');
@@ -94,6 +109,7 @@ export default function TaskEditPage() {
         startDate: startDate ? new Date(startDate).toISOString() : null,
         dueTime: dueTime || null,
         tags: tags || null,
+        color: color || null,
       };
 
       // Schedule-specific fields
@@ -223,6 +239,70 @@ export default function TaskEditPage() {
               className="input"
               placeholder="z.B. Haushalt, Wichtig"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Farbe
+            </label>
+            <div className="flex flex-wrap gap-2 items-center">
+              {/* No color option */}
+              <button
+                type="button"
+                onClick={() => setColor(null)}
+                className={cn(
+                  'w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center',
+                  color === null
+                    ? 'border-gray-900 ring-2 ring-gray-400'
+                    : 'border-gray-300 hover:border-gray-400'
+                )}
+                title="Keine Farbe"
+              >
+                <span className="text-gray-400 text-xs">–</span>
+              </button>
+              {/* Preset colors */}
+              {PRESET_COLORS.map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => setColor(preset.value)}
+                  className={cn(
+                    'w-8 h-8 rounded-full border-2 transition-all',
+                    color === preset.value
+                      ? 'border-gray-900 ring-2 ring-gray-400'
+                      : 'border-transparent hover:scale-110'
+                  )}
+                  style={{ backgroundColor: preset.value }}
+                  title={preset.label}
+                />
+              ))}
+              {/* Custom color picker */}
+              <div className="relative">
+                <input
+                  type="color"
+                  value={color || '#3B82F6'}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="absolute inset-0 w-8 h-8 opacity-0 cursor-pointer"
+                  title="Eigene Farbe wählen"
+                />
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full border-2 flex items-center justify-center cursor-pointer',
+                    color && !PRESET_COLORS.some(p => p.value === color)
+                      ? 'border-gray-900 ring-2 ring-gray-400'
+                      : 'border-gray-300 hover:border-gray-400'
+                  )}
+                  style={{
+                    backgroundColor: color && !PRESET_COLORS.some(p => p.value === color) ? color : 'white'
+                  }}
+                  title="Eigene Farbe wählen"
+                >
+                  {(!color || PRESET_COLORS.some(p => p.value === color)) && (
+                    <span className="text-gray-400 text-xs">+</span>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

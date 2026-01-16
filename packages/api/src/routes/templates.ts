@@ -97,6 +97,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
         yearlyDay: data.yearlyDay ?? null,
         dueTime: data.dueTime ?? null,
         tags: data.tags ?? null,
+        color: data.color ?? null,
         sortOrder: data.sortOrder,
       },
     });
@@ -146,6 +147,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
     if (data.yearlyDay !== undefined) updateData.yearlyDay = data.yearlyDay;
     if (data.dueTime !== undefined) updateData.dueTime = data.dueTime;
     if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.color !== undefined) updateData.color = data.color;
     if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
@@ -214,6 +216,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
       carryPolicy: original.carryPolicy,
       dueTime: original.dueTime,
       tags: original.tags,
+      color: original.color,
       sortOrder: original.sortOrder,
     };
 

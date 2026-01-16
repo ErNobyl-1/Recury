@@ -21,6 +21,7 @@ const BaseTemplateSchema = z.object({
   yearlyDay: z.number().int().min(1).max(31).optional().nullable(),
   dueTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional().nullable(), // HH:mm format
   tags: z.string().max(500).optional().nullable(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().nullable(), // Hex color format
   sortOrder: z.number().int().default(0),
 });
 

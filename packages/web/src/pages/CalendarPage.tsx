@@ -140,10 +140,6 @@ export default function CalendarPage() {
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isDayToday = isToday(day);
 
-            // Show max 2 open tasks, then "+X more"
-            const visibleOpen = openInstances.slice(0, 2);
-            const moreOpenCount = openInstances.length - visibleOpen.length;
-
             return (
               <button
                 key={day.toISOString()}
@@ -180,23 +176,28 @@ export default function CalendarPage() {
                   )}
                 </div>
 
-                {/* Open task titles */}
+                {/* Open task titles - show all with full titles */}
                 {isCurrentMonth && openInstances.length > 0 && (
-                  <div className="mt-1 space-y-0.5 text-left overflow-hidden">
-                    {visibleOpen.map((instance) => (
-                      <div
-                        key={instance.id}
-                        className="text-[10px] leading-tight text-primary-700 bg-primary-100 rounded px-1 py-0.5 truncate"
-                        title={instance.template?.title}
-                      >
-                        {instance.template?.title}
-                      </div>
-                    ))}
-                    {moreOpenCount > 0 && (
-                      <div className="text-[10px] text-gray-500 px-1">
-                        +{moreOpenCount} mehr
-                      </div>
-                    )}
+                  <div className="mt-1 space-y-0.5 text-left overflow-y-auto flex-1">
+                    {openInstances.map((instance) => {
+                      const taskColor = instance.template?.color;
+                      const defaultColor = '#6B7280'; // Gray for tasks without color
+                      const displayColor = taskColor || defaultColor;
+                      return (
+                        <div
+                          key={instance.id}
+                          className="text-[10px] leading-tight rounded px-1 py-0.5 break-words"
+                          style={{
+                            backgroundColor: `${displayColor}15`,
+                            color: displayColor,
+                            borderLeft: `2px solid ${displayColor}`,
+                          }}
+                          title={instance.template?.title}
+                        >
+                          {instance.template?.title}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </button>
@@ -213,17 +214,72 @@ export default function CalendarPage() {
           </h3>
 
           {selectedInstances.length > 0 ? (
-            <div className="space-y-2">
-              {selectedInstances.map((instance) => (
-                <TaskCard
-                  key={instance.id}
-                  instance={instance}
-                  onComplete={loadInstances}
-                  onEdit={() => setEditingInstance(instance)}
-                  onSnooze={loadInstances}
-                  onDelete={loadInstances}
-                />
-              ))}
+            <div className="space-y-4">
+              {/* Open tasks */}
+              {selectedInstances.filter(i => i.status === 'OPEN').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary-500" />
+                    Offen ({selectedInstances.filter(i => i.status === 'OPEN').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'OPEN').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Done tasks */}
+              {selectedInstances.filter(i => i.status === 'DONE').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500" />
+                    Erledigt ({selectedInstances.filter(i => i.status === 'DONE').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'DONE').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Failed tasks */}
+              {selectedInstances.filter(i => i.status === 'FAILED').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Fehlgeschlagen ({selectedInstances.filter(i => i.status === 'FAILED').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'FAILED').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <p className="text-gray-500 text-center py-4">
@@ -232,22 +288,6 @@ export default function CalendarPage() {
           )}
         </div>
       )}
-
-      {/* Legend */}
-      <div className="flex justify-center gap-6 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary-500" />
-          <span>Offen</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span>Erledigt</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-red-500" />
-          <span>Fehlgeschlagen</span>
-        </div>
-      </div>
 
       {/* Instance Edit Modal */}
       {editingInstance && (

@@ -45,6 +45,9 @@ model TaskTemplate {
   // Tags (comma-separated)
   tags String?
 
+  // Task color (hex format, e.g., "#3B82F6")
+  color String?
+
   // Sort order for UI
   sortOrder Int @default(0)
 
