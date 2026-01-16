@@ -54,6 +54,10 @@ export async function instanceRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: 'Cannot complete a failed instance' });
     }
 
+    if (instance.status === 'DELETED') {
+      return reply.status(400).send({ error: 'Cannot complete a deleted instance' });
+    }
+
     const updated = await prisma.taskInstance.update({
       where: { id },
       data: {

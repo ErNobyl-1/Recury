@@ -187,6 +187,13 @@ export default function TasksPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
+                    {template.color && (
+                      <span
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: template.color }}
+                        title={`Farbe: ${template.color}`}
+                      />
+                    )}
                     <h3 className="font-medium text-gray-900 truncate">{template.title}</h3>
                     {!template.isActive && (
                       <span className="badge bg-gray-200 text-gray-600">Archiviert</span>
