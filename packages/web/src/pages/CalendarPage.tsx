@@ -76,10 +76,10 @@ export default function CalendarPage() {
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="md:max-w-4xl md:mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Kalender</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Kalender</h1>
         <button
           onClick={loadInstances}
           disabled={loading}
@@ -90,9 +90,9 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      {/* Calendar Navigation */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-4">
+      {/* Calendar - full width on mobile, card on desktop */}
+      <div className="bg-white md:card md:p-4 -mx-4 px-2 py-3 md:mx-0 md:rounded-lg">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -100,7 +100,7 @@ export default function CalendarPage() {
             <ChevronLeft size={24} />
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <h2 className="text-lg font-semibold">
               {format(currentMonth, 'MMMM yyyy', { locale: de })}
             </h2>
@@ -121,16 +121,16 @@ export default function CalendarPage() {
         </div>
 
         {/* Week day headers */}
-        <div className="grid grid-cols-7 mb-2">
+        <div className="grid grid-cols-7 mb-1 md:mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+            <div key={day} className="text-center text-sm font-medium text-gray-500 py-1 md:py-2">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-px md:gap-1">
           {calendarDays.map((day) => {
             const dayInstances = getInstancesForDate(day);
             const openInstances = dayInstances.filter((i) => i.status === 'OPEN');
@@ -145,7 +145,7 @@ export default function CalendarPage() {
                 key={day.toISOString()}
                 onClick={() => setSelectedDate(day)}
                 className={cn(
-                  'min-h-[80px] p-1 rounded-lg transition-colors relative',
+                  'min-h-[70px] md:min-h-[80px] p-1 rounded-md md:rounded-lg transition-colors relative',
                   'flex flex-col items-stretch',
                   isCurrentMonth ? 'hover:bg-gray-100' : 'text-gray-300',
                   isSelected && 'bg-primary-100 hover:bg-primary-100',
@@ -186,7 +186,7 @@ export default function CalendarPage() {
                       return (
                         <div
                           key={instance.id}
-                          className="text-[10px] leading-tight rounded px-1 py-0.5 break-words"
+                          className="text-[10px] leading-tight rounded px-1 py-0.5 truncate"
                           style={{
                             backgroundColor: `${displayColor}15`,
                             color: displayColor,
@@ -208,7 +208,7 @@ export default function CalendarPage() {
 
       {/* Selected day details */}
       {selectedDate && (
-        <div className="card p-4">
+        <div className="bg-white md:card p-4 -mx-4 md:mx-0 md:rounded-lg">
           <h3 className="font-semibold text-gray-900 mb-3">
             {formatDate(selectedDate, 'EEEE, dd. MMMM yyyy')}
           </h3>
