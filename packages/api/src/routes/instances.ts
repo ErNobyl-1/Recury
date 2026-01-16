@@ -145,12 +145,15 @@ export async function instanceRoutes(fastify: FastifyInstance) {
       newDate = addDays(getToday(), 1);
     }
 
+    // newDate is already a local start-of-day, convert directly to UTC
+    const newDateUTC = toUTC(newDate);
+
     // Check if an instance already exists for that date
     const existing = await prisma.taskInstance.findUnique({
       where: {
         templateId_date: {
           templateId: instance.templateId,
-          date: startOfDay(toUTC(newDate)),
+          date: newDateUTC,
         },
       },
     });
@@ -165,7 +168,7 @@ export async function instanceRoutes(fastify: FastifyInstance) {
     const updated = await prisma.taskInstance.update({
       where: { id },
       data: {
-        date: startOfDay(toUTC(newDate)),
+        date: newDateUTC,
       },
       include: { template: true },
     });

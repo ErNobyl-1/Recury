@@ -1,6 +1,6 @@
 import { prisma } from './db.js';
 import { getOccurrencesInRange, getToday, toUTC, toZoned, formatDateKey } from './scheduler.js';
-import { startOfDay, isBefore, subDays } from 'date-fns';
+import { addDays, isBefore } from 'date-fns';
 import type { TaskTemplate, TaskInstance } from '@prisma/client';
 
 export async function generateInstancesForRange(
@@ -30,12 +30,16 @@ export async function generateInstancesForTemplate(
   const generatedInstances: TaskInstance[] = [];
 
   for (const occurrence of occurrences) {
+    // occurrence is already a local start-of-day from getOccurrencesInRange
+    // Convert directly to UTC without re-truncating to avoid shifting back a day
+    const dateUTC = toUTC(occurrence);
+
     // Check if instance already exists
     const existingInstance = await prisma.taskInstance.findUnique({
       where: {
         templateId_date: {
           templateId: template.id,
-          date: startOfDay(toUTC(occurrence)),
+          date: dateUTC,
         },
       },
     });
@@ -44,7 +48,7 @@ export async function generateInstancesForTemplate(
       const instance = await prisma.taskInstance.create({
         data: {
           templateId: template.id,
-          date: startOfDay(toUTC(occurrence)),
+          date: dateUTC,
           status: 'OPEN',
         },
       });
@@ -57,7 +61,6 @@ export async function generateInstancesForTemplate(
 
 export async function processFailedInstances(): Promise<number> {
   const today = getToday();
-  const yesterday = subDays(today, 1);
 
   // Find all OPEN instances from templates with FAIL_ON_MISS policy
   // where the date is before today
@@ -65,7 +68,7 @@ export async function processFailedInstances(): Promise<number> {
     where: {
       status: 'OPEN',
       date: {
-        lt: startOfDay(toUTC(today)),
+        lt: toUTC(today),
       },
       template: {
         carryPolicy: 'FAIL_ON_MISS',
@@ -81,8 +84,8 @@ export async function processFailedInstances(): Promise<number> {
 
 export async function getDashboardData() {
   const today = getToday();
-  const tomorrow = startOfDay(new Date(today.getTime() + 24 * 60 * 60 * 1000));
-  const endOfTomorrow = startOfDay(new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000));
+  const tomorrow = addDays(today, 1);
+  const endOfTomorrow = addDays(tomorrow, 1);
 
   // Generate instances for today and tomorrow
   await generateInstancesForRange(today, tomorrow);
@@ -97,14 +100,14 @@ export async function getDashboardData() {
         // Today's instances
         {
           date: {
-            gte: startOfDay(toUTC(today)),
-            lt: startOfDay(toUTC(tomorrow)),
+            gte: toUTC(today),
+            lt: toUTC(tomorrow),
           },
         },
         // Overdue instances (CARRY_OVER_STACK only)
         {
           date: {
-            lt: startOfDay(toUTC(today)),
+            lt: toUTC(today),
           },
           status: 'OPEN',
           template: {
@@ -126,8 +129,8 @@ export async function getDashboardData() {
   const tomorrowInstances = await prisma.taskInstance.findMany({
     where: {
       date: {
-        gte: startOfDay(toUTC(tomorrow)),
-        lt: startOfDay(toUTC(endOfTomorrow)),
+        gte: toUTC(tomorrow),
+        lt: toUTC(endOfTomorrow),
       },
     },
     include: {
@@ -196,8 +199,8 @@ export async function getInstancesForRange(startDate: Date, endDate: Date) {
   const instances = await prisma.taskInstance.findMany({
     where: {
       date: {
-        gte: startOfDay(toUTC(startDate)),
-        lte: startOfDay(toUTC(endDate)),
+        gte: toUTC(startDate),
+        lte: toUTC(endDate),
       },
     },
     include: {
