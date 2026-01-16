@@ -23,7 +23,7 @@ Recury ist eine selbst-hostbare, lokale Todo-Webapp mit Fokus auf wiederkehrende
 ### 1. Repository klonen
 
 ```bash
-git clone https://github.com/dein-user/recury.git
+git clone https://github.com/ErNobyl-1/Recury.git
 cd recury
 ```
 
