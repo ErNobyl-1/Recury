@@ -1,4 +1,4 @@
-import { Check, Clock, AlertCircle, ChevronRight, MoreVertical } from 'lucide-react';
+import { Check, Clock, AlertCircle, ChevronRight, MoreVertical, Trash2, Edit3 } from 'lucide-react';
 import { useState } from 'react';
 import { Instance, instances as instancesApi } from '../lib/api';
 import { formatDate, formatTime, isOverdue, cn } from '../lib/utils';
@@ -8,6 +8,7 @@ interface TaskCardProps {
   onComplete?: () => void;
   onEdit?: () => void;
   onSnooze?: () => void;
+  onDelete?: () => void;
   showDate?: boolean;
 }
 
@@ -16,6 +17,7 @@ export default function TaskCard({
   onComplete,
   onEdit,
   onSnooze,
+  onDelete,
   showDate = false,
 }: TaskCardProps) {
   const [loading, setLoading] = useState(false);
@@ -70,6 +72,26 @@ export default function TaskCard({
     }
   };
 
+  const handleDelete = async () => {
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      await instancesApi.delete(instance.id);
+      onDelete?.();
+    } catch (error) {
+      console.error('Failed to delete instance:', error);
+    } finally {
+      setLoading(false);
+      setShowMenu(false);
+    }
+  };
+
+  // Use custom values if set, otherwise fall back to template
+  const displayTitle = instance.customTitle || instance.template.title;
+  const displayNotes = instance.customNotes || instance.template.notes;
+  const hasCustomization = instance.customTitle || instance.customNotes;
+
   return (
     <div
       className={cn(
@@ -98,10 +120,15 @@ export default function TaskCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={cn('font-medium truncate', isDone && 'line-through')}>
-            {instance.template.title}
+            {displayTitle}
           </span>
+          {hasCustomization && (
+            <span title="Angepasster Termin">
+              <Edit3 size={12} className="text-blue-500 flex-shrink-0" />
+            </span>
+          )}
           {isTaskOverdue && (
-            <span className="badge badge-overdue flex-shrink-0">Überfällig</span>
+            <span className="badge badge-overdue flex-shrink-0">Ueberfaellig</span>
           )}
           {isFailed && (
             <span className="badge badge-failed flex-shrink-0">Fehlgeschlagen</span>
@@ -121,8 +148,8 @@ export default function TaskCard({
               {formatTime(instance.template.dueTime)}
             </span>
           )}
-          {instance.template.notes && (
-            <span className="truncate">{instance.template.notes}</span>
+          {displayNotes && (
+            <span className="truncate">{displayNotes}</span>
           )}
         </div>
       </div>
@@ -150,7 +177,7 @@ export default function TaskCard({
                     setShowMenu(false);
                   }}
                 />
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[150px]">
+                <div className="absolute right-0 bottom-full mb-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[180px]">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -168,7 +195,22 @@ export default function TaskCard({
                     }}
                     className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors"
                   >
-                    Bearbeiten
+                    Diesen Termin bearbeiten
+                  </button>
+                  <hr className="my-1 border-gray-200" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm('Diesen Termin wirklich loeschen?')) {
+                        handleDelete();
+                      } else {
+                        setShowMenu(false);
+                      }
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 size={14} />
+                    Termin loeschen
                   </button>
                 </div>
               </>

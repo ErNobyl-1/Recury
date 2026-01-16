@@ -140,9 +140,12 @@ export interface Instance {
   id: string;
   templateId: string;
   date: string;
-  status: 'OPEN' | 'DONE' | 'FAILED';
+  status: 'OPEN' | 'DONE' | 'FAILED' | 'DELETED';
   completedAt: string | null;
   createdAt: string;
+  // Instance-level overrides (null = use template value)
+  customTitle?: string | null;
+  customNotes?: string | null;
   template: {
     id: string;
     title: string;
@@ -167,6 +170,12 @@ export interface DashboardData {
   };
 }
 
+export interface UpdateInstanceInput {
+  customTitle?: string | null;
+  customNotes?: string | null;
+  date?: string;
+}
+
 export const instances = {
   dashboard: () =>
     request<DashboardData>('/dashboard'),
@@ -188,6 +197,17 @@ export const instances = {
     request<Instance>(`/instances/${id}/snooze`, {
       method: 'POST',
       body: JSON.stringify({ toDate }),
+    }),
+
+  update: (id: string, data: UpdateInstanceInput) =>
+    request<Instance>(`/instances/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/instances/${id}`, {
+      method: 'DELETE',
     }),
 
   rebuild: (from: string, to: string) =>

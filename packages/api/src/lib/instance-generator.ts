@@ -96,6 +96,10 @@ export async function getDashboardData() {
   // Get today's instances (including overdue CARRY_OVER_STACK)
   const todayInstances = await prisma.taskInstance.findMany({
     where: {
+      // Exclude deleted instances
+      status: {
+        not: 'DELETED',
+      },
       OR: [
         // Today's instances
         {
@@ -131,6 +135,10 @@ export async function getDashboardData() {
       date: {
         gte: toUTC(tomorrow),
         lt: toUTC(endOfTomorrow),
+      },
+      // Exclude deleted instances
+      status: {
+        not: 'DELETED',
       },
     },
     include: {
@@ -177,6 +185,9 @@ function formatInstance(instance: TaskInstance & { template: TaskTemplate }) {
     status: instance.status,
     completedAt: instance.completedAt?.toISOString() ?? null,
     createdAt: instance.createdAt.toISOString(),
+    // Instance-level overrides
+    customTitle: instance.customTitle,
+    customNotes: instance.customNotes,
     template: {
       id: instance.template.id,
       title: instance.template.title,
@@ -201,6 +212,10 @@ export async function getInstancesForRange(startDate: Date, endDate: Date) {
       date: {
         gte: toUTC(startDate),
         lte: toUTC(endDate),
+      },
+      // Exclude deleted instances
+      status: {
+        not: 'DELETED',
       },
     },
     include: {

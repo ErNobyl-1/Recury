@@ -18,6 +18,7 @@ import { de } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { instances as instancesApi, Instance } from '../lib/api';
 import TaskCard from '../components/TaskCard';
+import InstanceEditModal from '../components/InstanceEditModal';
 import { cn, formatDate } from '../lib/utils';
 
 export default function CalendarPage() {
@@ -25,6 +26,7 @@ export default function CalendarPage() {
   const [instances, setInstances] = useState<Instance[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingInstance, setEditingInstance] = useState<Instance | null>(null);
   const navigate = useNavigate();
 
   const loadInstances = useCallback(async () => {
@@ -217,8 +219,9 @@ export default function CalendarPage() {
                   key={instance.id}
                   instance={instance}
                   onComplete={loadInstances}
-                  onEdit={() => navigate(`/tasks/${instance.templateId}`)}
+                  onEdit={() => setEditingInstance(instance)}
                   onSnooze={loadInstances}
+                  onDelete={loadInstances}
                 />
               ))}
             </div>
@@ -245,6 +248,19 @@ export default function CalendarPage() {
           <span>Fehlgeschlagen</span>
         </div>
       </div>
+
+      {/* Instance Edit Modal */}
+      {editingInstance && (
+        <InstanceEditModal
+          instance={editingInstance}
+          onClose={() => setEditingInstance(null)}
+          onSave={loadInstances}
+          onEditTemplate={() => {
+            navigate(`/tasks/${editingInstance.templateId}`);
+            setEditingInstance(null);
+          }}
+        />
+      )}
     </div>
   );
 }

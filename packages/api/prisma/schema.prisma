@@ -59,10 +59,14 @@ model TaskInstance {
   id          String   @id @default(uuid())
   templateId  String
   date        DateTime // Due date (stored as date only, time at 00:00)
-  // OPEN, DONE, FAILED
+  // OPEN, DONE, FAILED, DELETED
   status      String   @default("OPEN")
   completedAt DateTime?
   createdAt   DateTime @default(now())
+
+  // Instance-level overrides (null = use template value)
+  customTitle String?
+  customNotes String?
 
   // Relation
   template TaskTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
