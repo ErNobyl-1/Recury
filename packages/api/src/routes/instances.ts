@@ -54,6 +54,10 @@ export async function instanceRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: 'Cannot complete a failed instance' });
     }
 
+    if (instance.status === 'DELETED') {
+      return reply.status(400).send({ error: 'Cannot complete a deleted instance' });
+    }
+
     const updated = await prisma.taskInstance.update({
       where: { id },
       data: {
@@ -183,6 +187,120 @@ export async function instanceRoutes(fastify: FastifyInstance) {
         title: updated.template.title,
       },
     };
+  });
+
+  // Update a single instance (edit this occurrence only)
+  fastify.patch('/instances/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: string };
+    const { customTitle, customNotes, date } = request.body as {
+      customTitle?: string | null;
+      customNotes?: string | null;
+      date?: string;
+    };
+
+    const instance = await prisma.taskInstance.findUnique({
+      where: { id },
+      include: { template: true },
+    });
+
+    if (!instance) {
+      return reply.status(404).send({ error: 'Instance not found' });
+    }
+
+    if (instance.status === 'DELETED') {
+      return reply.status(400).send({ error: 'Cannot edit a deleted instance' });
+    }
+
+    const updateData: {
+      customTitle?: string | null;
+      customNotes?: string | null;
+      date?: Date;
+    } = {};
+
+    // Handle customTitle - empty string means clear override (use template)
+    if (customTitle !== undefined) {
+      updateData.customTitle = customTitle === '' ? null : customTitle;
+    }
+
+    // Handle customNotes - empty string means clear override (use template)
+    if (customNotes !== undefined) {
+      updateData.customNotes = customNotes === '' ? null : customNotes;
+    }
+
+    // Handle date change (reschedule)
+    if (date) {
+      try {
+        const newDate = startOfDay(parseISO(date));
+        const newDateUTC = toUTC(newDate);
+
+        // Check if an instance already exists for that date
+        const existing = await prisma.taskInstance.findUnique({
+          where: {
+            templateId_date: {
+              templateId: instance.templateId,
+              date: newDateUTC,
+            },
+          },
+        });
+
+        if (existing && existing.id !== id) {
+          return reply.status(400).send({
+            error: 'An instance already exists for this date.',
+          });
+        }
+
+        updateData.date = newDateUTC;
+      } catch {
+        return reply.status(400).send({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      }
+    }
+
+    const updated = await prisma.taskInstance.update({
+      where: { id },
+      data: updateData,
+      include: { template: true },
+    });
+
+    return {
+      id: updated.id,
+      templateId: updated.templateId,
+      date: formatDateKey(toZoned(updated.date)),
+      status: updated.status,
+      completedAt: updated.completedAt?.toISOString() ?? null,
+      customTitle: updated.customTitle,
+      customNotes: updated.customNotes,
+      template: {
+        id: updated.template.id,
+        title: updated.template.title,
+        notes: updated.template.notes,
+      },
+    };
+  });
+
+  // Delete a single instance (soft delete - marks as DELETED)
+  fastify.delete('/instances/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: string };
+
+    const instance = await prisma.taskInstance.findUnique({
+      where: { id },
+    });
+
+    if (!instance) {
+      return reply.status(404).send({ error: 'Instance not found' });
+    }
+
+    if (instance.status === 'DELETED') {
+      return reply.status(400).send({ error: 'Instance is already deleted' });
+    }
+
+    await prisma.taskInstance.update({
+      where: { id },
+      data: {
+        status: 'DELETED',
+      },
+    });
+
+    return { success: true };
   });
 
   // Admin: Rebuild instances for a date range

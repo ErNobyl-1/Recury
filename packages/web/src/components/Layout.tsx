@@ -1,6 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, ListTodo, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, Calendar, ListTodo, Settings, Plus } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const navItems = [
@@ -11,12 +10,7 @@ const navItems = [
 ];
 
 export default function Layout() {
-  const { logout } = useAuth();
   const location = useLocation();
-
-  const handleLogout = async () => {
-    await logout();
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -44,13 +38,13 @@ export default function Layout() {
             ))}
           </nav>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        <NavLink
+          to="/tasks/new"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg transition-colors"
         >
-          <LogOut size={20} />
-          <span>Abmelden</span>
-        </button>
+          <Plus size={20} />
+          <span>Neue Aufgabe</span>
+        </NavLink>
       </header>
 
       {/* Main Content */}

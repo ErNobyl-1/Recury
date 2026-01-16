@@ -97,6 +97,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
         yearlyDay: data.yearlyDay ?? null,
         dueTime: data.dueTime ?? null,
         tags: data.tags ?? null,
+        color: data.color ?? null,
         sortOrder: data.sortOrder,
       },
     });
@@ -146,13 +147,45 @@ export async function templateRoutes(fastify: FastifyInstance) {
     if (data.yearlyDay !== undefined) updateData.yearlyDay = data.yearlyDay;
     if (data.dueTime !== undefined) updateData.dueTime = data.dueTime;
     if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.color !== undefined) updateData.color = data.color;
     if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
+
+    // Check if schedule-relevant fields changed
+    const scheduleFieldsChanged =
+      data.scheduleType !== undefined ||
+      data.startDate !== undefined ||
+      data.anchorDate !== undefined ||
+      data.intervalUnit !== undefined ||
+      data.intervalValue !== undefined ||
+      data.weeklyDays !== undefined ||
+      data.monthlyDay !== undefined ||
+      data.monthlyMode !== undefined ||
+      data.yearlyMonth !== undefined ||
+      data.yearlyDay !== undefined;
 
     const template = await prisma.taskTemplate.update({
       where: { id },
       data: updateData,
     });
+
+    // If schedule changed, delete future OPEN instances and regenerate
+    if (scheduleFieldsChanged) {
+      const today = getToday();
+
+      // Delete all future OPEN instances (keep DONE and FAILED as history)
+      await prisma.taskInstance.deleteMany({
+        where: {
+          templateId: id,
+          date: { gte: today },
+          status: 'OPEN',
+        },
+      });
+
+      // Regenerate instances for today and next month
+      const endDate = addMonths(today, 1);
+      await generateInstancesForTemplate(template, today, endDate);
+    }
 
     return template;
   });
@@ -183,6 +216,7 @@ export async function templateRoutes(fastify: FastifyInstance) {
       carryPolicy: original.carryPolicy,
       dueTime: original.dueTime,
       tags: original.tags,
+      color: original.color,
       sortOrder: original.sortOrder,
     };
 

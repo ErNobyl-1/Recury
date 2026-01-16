@@ -1,7 +1,6 @@
 services:
   recury-app:
     build: .
-    image: recury/recury
     container_name: recury
     restart: unless-stopped
     ports:

@@ -38,6 +38,8 @@ export async function initializeAuth(): Promise<void> {
       },
     });
     console.log('Auth initialized with password from AUTH_PASSWORD env var (or default "admin")');
+  } else {
+    console.log('Auth already configured. To reset password, delete AppSettings from database or use the web UI.');
   }
 }
 

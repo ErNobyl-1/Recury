@@ -18,6 +18,7 @@ import { de } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { instances as instancesApi, Instance } from '../lib/api';
 import TaskCard from '../components/TaskCard';
+import InstanceEditModal from '../components/InstanceEditModal';
 import { cn, formatDate } from '../lib/utils';
 
 export default function CalendarPage() {
@@ -25,6 +26,7 @@ export default function CalendarPage() {
   const [instances, setInstances] = useState<Instance[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingInstance, setEditingInstance] = useState<Instance | null>(null);
   const navigate = useNavigate();
 
   const loadInstances = useCallback(async () => {
@@ -74,10 +76,10 @@ export default function CalendarPage() {
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="md:max-w-4xl md:mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Kalender</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Kalender</h1>
         <button
           onClick={loadInstances}
           disabled={loading}
@@ -88,9 +90,9 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      {/* Calendar Navigation */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-4">
+      {/* Calendar - full width on mobile, card on desktop */}
+      <div className="bg-white md:card md:p-4 -mx-4 px-2 py-3 md:mx-0 md:rounded-lg">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -98,7 +100,7 @@ export default function CalendarPage() {
             <ChevronLeft size={24} />
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <h2 className="text-lg font-semibold">
               {format(currentMonth, 'MMMM yyyy', { locale: de })}
             </h2>
@@ -119,19 +121,19 @@ export default function CalendarPage() {
         </div>
 
         {/* Week day headers */}
-        <div className="grid grid-cols-7 mb-2">
+        <div className="grid grid-cols-7 mb-1 md:mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+            <div key={day} className="text-center text-sm font-medium text-gray-500 py-1 md:py-2">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-px md:gap-1">
           {calendarDays.map((day) => {
             const dayInstances = getInstancesForDate(day);
-            const openCount = dayInstances.filter((i) => i.status === 'OPEN').length;
+            const openInstances = dayInstances.filter((i) => i.status === 'OPEN');
             const doneCount = dayInstances.filter((i) => i.status === 'DONE').length;
             const failedCount = dayInstances.filter((i) => i.status === 'FAILED').length;
             const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -143,35 +145,59 @@ export default function CalendarPage() {
                 key={day.toISOString()}
                 onClick={() => setSelectedDate(day)}
                 className={cn(
-                  'aspect-square p-1 rounded-lg transition-colors relative',
-                  'flex flex-col items-center justify-start',
+                  'min-h-[70px] md:min-h-[80px] p-1 rounded-md md:rounded-lg transition-colors relative',
+                  'flex flex-col items-stretch',
                   isCurrentMonth ? 'hover:bg-gray-100' : 'text-gray-300',
                   isSelected && 'bg-primary-100 hover:bg-primary-100',
                   isDayToday && !isSelected && 'bg-primary-50'
                 )}
               >
-                <span
-                  className={cn(
-                    'text-sm font-medium',
-                    isDayToday && 'text-primary-600 font-bold',
-                    isSelected && 'text-primary-700'
-                  )}
-                >
-                  {format(day, 'd')}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={cn(
+                      'text-sm font-medium',
+                      isDayToday && 'text-primary-600 font-bold',
+                      isSelected && 'text-primary-700'
+                    )}
+                  >
+                    {format(day, 'd')}
+                  </span>
 
-                {/* Task indicators */}
-                {isCurrentMonth && dayInstances.length > 0 && (
-                  <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
-                    {openCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-primary-500" title={`${openCount} offen`} />
-                    )}
-                    {doneCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-green-500" title={`${doneCount} erledigt`} />
-                    )}
-                    {failedCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-red-500" title={`${failedCount} fehlgeschlagen`} />
-                    )}
+                  {/* Done/Failed indicators */}
+                  {isCurrentMonth && (doneCount > 0 || failedCount > 0) && (
+                    <div className="flex gap-0.5">
+                      {doneCount > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-green-500" title={`${doneCount} erledigt`} />
+                      )}
+                      {failedCount > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-red-500" title={`${failedCount} fehlgeschlagen`} />
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Open task titles - show all with full titles */}
+                {isCurrentMonth && openInstances.length > 0 && (
+                  <div className="mt-1 space-y-0.5 text-left overflow-y-auto flex-1">
+                    {openInstances.map((instance) => {
+                      const taskColor = instance.template?.color;
+                      const defaultColor = '#6B7280'; // Gray for tasks without color
+                      const displayColor = taskColor || defaultColor;
+                      return (
+                        <div
+                          key={instance.id}
+                          className="text-[10px] leading-tight rounded px-1 py-0.5 truncate"
+                          style={{
+                            backgroundColor: `${displayColor}15`,
+                            color: displayColor,
+                            borderLeft: `2px solid ${displayColor}`,
+                          }}
+                          title={instance.template?.title}
+                        >
+                          {instance.template?.title}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </button>
@@ -182,22 +208,78 @@ export default function CalendarPage() {
 
       {/* Selected day details */}
       {selectedDate && (
-        <div className="card p-4">
+        <div className="bg-white md:card p-4 -mx-4 md:mx-0 md:rounded-lg">
           <h3 className="font-semibold text-gray-900 mb-3">
             {formatDate(selectedDate, 'EEEE, dd. MMMM yyyy')}
           </h3>
 
           {selectedInstances.length > 0 ? (
-            <div className="space-y-2">
-              {selectedInstances.map((instance) => (
-                <TaskCard
-                  key={instance.id}
-                  instance={instance}
-                  onComplete={loadInstances}
-                  onEdit={() => navigate(`/tasks/${instance.templateId}`)}
-                  onSnooze={loadInstances}
-                />
-              ))}
+            <div className="space-y-4">
+              {/* Open tasks */}
+              {selectedInstances.filter(i => i.status === 'OPEN').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary-500" />
+                    Offen ({selectedInstances.filter(i => i.status === 'OPEN').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'OPEN').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Done tasks */}
+              {selectedInstances.filter(i => i.status === 'DONE').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500" />
+                    Erledigt ({selectedInstances.filter(i => i.status === 'DONE').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'DONE').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Failed tasks */}
+              {selectedInstances.filter(i => i.status === 'FAILED').length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Fehlgeschlagen ({selectedInstances.filter(i => i.status === 'FAILED').length})
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedInstances.filter(i => i.status === 'FAILED').map((instance) => (
+                      <TaskCard
+                        key={instance.id}
+                        instance={instance}
+                        onComplete={loadInstances}
+                        onEdit={() => setEditingInstance(instance)}
+                        onSnooze={loadInstances}
+                        onDelete={loadInstances}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <p className="text-gray-500 text-center py-4">
@@ -207,21 +289,18 @@ export default function CalendarPage() {
         </div>
       )}
 
-      {/* Legend */}
-      <div className="flex justify-center gap-6 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary-500" />
-          <span>Offen</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span>Erledigt</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-red-500" />
-          <span>Fehlgeschlagen</span>
-        </div>
-      </div>
+      {/* Instance Edit Modal */}
+      {editingInstance && (
+        <InstanceEditModal
+          instance={editingInstance}
+          onClose={() => setEditingInstance(null)}
+          onSave={loadInstances}
+          onEditTemplate={() => {
+            navigate(`/tasks/${editingInstance.templateId}`);
+            setEditingInstance(null);
+          }}
+        />
+      )}
     </div>
   );
 }

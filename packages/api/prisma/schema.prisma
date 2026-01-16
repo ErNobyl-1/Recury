@@ -45,6 +45,9 @@ model TaskTemplate {
   // Tags (comma-separated)
   tags String?
 
+  // Task color (hex format, e.g., "#3B82F6")
+  color String?
+
   // Sort order for UI
   sortOrder Int @default(0)
 
@@ -59,10 +62,14 @@ model TaskInstance {
   id          String   @id @default(uuid())
   templateId  String
   date        DateTime // Due date (stored as date only, time at 00:00)
-  // OPEN, DONE, FAILED
+  // OPEN, DONE, FAILED, DELETED
   status      String   @default("OPEN")
   completedAt DateTime?
   createdAt   DateTime @default(now())
+
+  // Instance-level overrides (null = use template value)
+  customTitle String?
+  customNotes String?
 
   // Relation
   template TaskTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)

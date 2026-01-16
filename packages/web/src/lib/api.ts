@@ -6,12 +6,18 @@ async function request<T>(
 ): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
 
+  const headers: Record<string, string> = {
+    ...options.headers as Record<string, string>,
+  };
+
+  // Only set Content-Type for requests with a body
+  if (options.body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
     credentials: 'include',
   });
 
@@ -76,6 +82,7 @@ export interface Template {
   yearlyDay: number | null;
   dueTime: string | null;
   tags: string | null;
+  color: string | null;
   sortOrder: number;
 }
 
@@ -95,6 +102,7 @@ export interface CreateTemplateInput {
   yearlyDay?: number | null;
   dueTime?: string | null;
   tags?: string | null;
+  color?: string | null;
   sortOrder?: number;
 }
 
@@ -140,9 +148,12 @@ export interface Instance {
   id: string;
   templateId: string;
   date: string;
-  status: 'OPEN' | 'DONE' | 'FAILED';
+  status: 'OPEN' | 'DONE' | 'FAILED' | 'DELETED';
   completedAt: string | null;
   createdAt: string;
+  // Instance-level overrides (null = use template value)
+  customTitle?: string | null;
+  customNotes?: string | null;
   template: {
     id: string;
     title: string;
@@ -151,6 +162,7 @@ export interface Instance {
     scheduleType: string;
     dueTime?: string | null;
     tags?: string | null;
+    color?: string | null;
   };
 }
 
@@ -165,6 +177,12 @@ export interface DashboardData {
     open: Instance[];
     done: Instance[];
   };
+}
+
+export interface UpdateInstanceInput {
+  customTitle?: string | null;
+  customNotes?: string | null;
+  date?: string;
 }
 
 export const instances = {
@@ -188,6 +206,17 @@ export const instances = {
     request<Instance>(`/instances/${id}/snooze`, {
       method: 'POST',
       body: JSON.stringify({ toDate }),
+    }),
+
+  update: (id: string, data: UpdateInstanceInput) =>
+    request<Instance>(`/instances/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/instances/${id}`, {
+      method: 'DELETE',
     }),
 
   rebuild: (from: string, to: string) =>
