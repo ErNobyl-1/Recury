@@ -38,6 +38,12 @@ auth.json
 *.swo
 *~
 
+# Claude Code
+.claude/
+
+# Lock files (use npm ci in CI/CD)
+package-lock.json
+
 # OS
 .DS_Store
 Thumbs.db
