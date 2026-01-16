@@ -1,0 +1,26 @@
+services:
+  recury-app:
+    build: .
+    image: recury/recury
+    container_name: recury
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8123}:3000"
+    volumes:
+      - recury-data:/data
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/data/recury.db
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-secret-in-production}
+      - TZ=Europe/Berlin
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  recury-data:
+    name: recury-data

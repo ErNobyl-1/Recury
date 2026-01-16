@@ -1,0 +1,32 @@
+{
+  "name": "recury",
+  "version": "1.0.0",
+  "description": "Aufgaben, die an dich denken.",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev -w @recury/api",
+    "dev:web": "npm run dev -w @recury/web",
+    "build": "npm run build -w @recury/api && npm run build -w @recury/web",
+    "build:api": "npm run build -w @recury/api",
+    "build:web": "npm run build -w @recury/web",
+    "start": "npm run start -w @recury/api",
+    "db:generate": "npm run db:generate -w @recury/api",
+    "db:migrate": "npm run db:migrate -w @recury/api",
+    "db:push": "npm run db:push -w @recury/api",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

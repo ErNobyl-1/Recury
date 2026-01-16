@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Build outputs
+dist
+*/dist
+*.tsbuildinfo
+
+# Database
+*.db
+*.db-journal
+data
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# Docker
+.docker-data
+docker-data
+
+# Test & coverage
+coverage
+*.test.ts
+*.spec.ts
