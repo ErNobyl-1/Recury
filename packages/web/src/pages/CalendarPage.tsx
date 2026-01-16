@@ -131,46 +131,69 @@ export default function CalendarPage() {
         <div className="grid grid-cols-7 gap-1">
           {calendarDays.map((day) => {
             const dayInstances = getInstancesForDate(day);
-            const openCount = dayInstances.filter((i) => i.status === 'OPEN').length;
+            const openInstances = dayInstances.filter((i) => i.status === 'OPEN');
             const doneCount = dayInstances.filter((i) => i.status === 'DONE').length;
             const failedCount = dayInstances.filter((i) => i.status === 'FAILED').length;
             const isSelected = selectedDate && isSameDay(day, selectedDate);
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isDayToday = isToday(day);
 
+            // Show max 2 open tasks, then "+X more"
+            const visibleOpen = openInstances.slice(0, 2);
+            const moreOpenCount = openInstances.length - visibleOpen.length;
+
             return (
               <button
                 key={day.toISOString()}
                 onClick={() => setSelectedDate(day)}
                 className={cn(
-                  'aspect-square p-1 rounded-lg transition-colors relative',
-                  'flex flex-col items-center justify-start',
+                  'min-h-[80px] p-1 rounded-lg transition-colors relative',
+                  'flex flex-col items-stretch',
                   isCurrentMonth ? 'hover:bg-gray-100' : 'text-gray-300',
                   isSelected && 'bg-primary-100 hover:bg-primary-100',
                   isDayToday && !isSelected && 'bg-primary-50'
                 )}
               >
-                <span
-                  className={cn(
-                    'text-sm font-medium',
-                    isDayToday && 'text-primary-600 font-bold',
-                    isSelected && 'text-primary-700'
-                  )}
-                >
-                  {format(day, 'd')}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={cn(
+                      'text-sm font-medium',
+                      isDayToday && 'text-primary-600 font-bold',
+                      isSelected && 'text-primary-700'
+                    )}
+                  >
+                    {format(day, 'd')}
+                  </span>
 
-                {/* Task indicators */}
-                {isCurrentMonth && dayInstances.length > 0 && (
-                  <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
-                    {openCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-primary-500" title={`${openCount} offen`} />
-                    )}
-                    {doneCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-green-500" title={`${doneCount} erledigt`} />
-                    )}
-                    {failedCount > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-red-500" title={`${failedCount} fehlgeschlagen`} />
+                  {/* Done/Failed indicators */}
+                  {isCurrentMonth && (doneCount > 0 || failedCount > 0) && (
+                    <div className="flex gap-0.5">
+                      {doneCount > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-green-500" title={`${doneCount} erledigt`} />
+                      )}
+                      {failedCount > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-red-500" title={`${failedCount} fehlgeschlagen`} />
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Open task titles */}
+                {isCurrentMonth && openInstances.length > 0 && (
+                  <div className="mt-1 space-y-0.5 text-left overflow-hidden">
+                    {visibleOpen.map((instance) => (
+                      <div
+                        key={instance.id}
+                        className="text-[10px] leading-tight text-primary-700 bg-primary-100 rounded px-1 py-0.5 truncate"
+                        title={instance.template?.title}
+                      >
+                        {instance.template?.title}
+                      </div>
+                    ))}
+                    {moreOpenCount > 0 && (
+                      <div className="text-[10px] text-gray-500 px-1">
+                        +{moreOpenCount} mehr
+                      </div>
                     )}
                   </div>
                 )}

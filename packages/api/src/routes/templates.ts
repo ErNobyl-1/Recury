@@ -149,10 +149,41 @@ export async function templateRoutes(fastify: FastifyInstance) {
     if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
+    // Check if schedule-relevant fields changed
+    const scheduleFieldsChanged =
+      data.scheduleType !== undefined ||
+      data.startDate !== undefined ||
+      data.anchorDate !== undefined ||
+      data.intervalUnit !== undefined ||
+      data.intervalValue !== undefined ||
+      data.weeklyDays !== undefined ||
+      data.monthlyDay !== undefined ||
+      data.monthlyMode !== undefined ||
+      data.yearlyMonth !== undefined ||
+      data.yearlyDay !== undefined;
+
     const template = await prisma.taskTemplate.update({
       where: { id },
       data: updateData,
     });
+
+    // If schedule changed, delete future OPEN instances and regenerate
+    if (scheduleFieldsChanged) {
+      const today = getToday();
+
+      // Delete all future OPEN instances (keep DONE and FAILED as history)
+      await prisma.taskInstance.deleteMany({
+        where: {
+          templateId: id,
+          date: { gte: today },
+          status: 'OPEN',
+        },
+      });
+
+      // Regenerate instances for today and next month
+      const endDate = addMonths(today, 1);
+      await generateInstancesForTemplate(template, today, endDate);
+    }
 
     return template;
   });
