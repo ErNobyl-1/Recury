@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🔄 Recury
+<img src="logo.png" alt="Recury Logo" width="120" />
+
+# Recury
 
 **Tasks that think of you.**
 
