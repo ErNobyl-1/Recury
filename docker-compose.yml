@@ -1,6 +1,9 @@
 services:
   recury-app:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_DEFAULT_LOCALE: ${VITE_DEFAULT_LOCALE:-en}
     container_name: recury
     restart: unless-stopped
     ports:
