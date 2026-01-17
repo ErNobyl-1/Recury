@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function LoginPage() {
   const [password, setPassword] = useState('');
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,10 +22,10 @@ export default function LoginPage() {
       if (success) {
         navigate('/');
       } else {
-        setError('Falsches Passwort');
+        setError(t('auth.wrongPassword'));
       }
     } catch {
-      setError('Anmeldung fehlgeschlagen');
+      setError(t('auth.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -36,14 +38,14 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
             <Lock size={32} className="text-primary-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Recury</h1>
-          <p className="text-gray-500 mt-1">Aufgaben, die an dich denken.</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('app.name')}</h1>
+          <p className="text-gray-500 mt-1">{t('app.tagline')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card p-6">
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Passwort
+              {t('auth.password')}
             </label>
             <input
               type="password"
@@ -51,7 +53,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"
-              placeholder="Passwort eingeben"
+              placeholder={t('auth.passwordPlaceholder')}
               autoFocus
               required
             />
@@ -68,7 +70,7 @@ export default function LoginPage() {
             disabled={loading}
             className="btn btn-primary w-full"
           >
-            {loading ? 'Anmelden...' : 'Anmelden'}
+            {loading ? t('auth.loggingIn') : t('auth.login')}
           </button>
         </form>
       </div>

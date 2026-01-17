@@ -4,25 +4,17 @@ import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { templates as templatesApi, CreateTemplateInput } from '../lib/api';
 import { format, parseISO } from 'date-fns';
 import { cn } from '../lib/utils';
+import { useTranslation } from '../i18n';
 
 type ScheduleType = 'ONCE' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'INTERVAL';
 type CarryPolicy = 'FAIL_ON_MISS' | 'CARRY_OVER_STACK';
 type IntervalUnit = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
 type MonthlyMode = 'FIRST_DAY' | 'LAST_DAY' | 'SPECIFIC_DAY';
 
-const WEEKDAYS = [
-  { value: 1, label: 'Mo' },
-  { value: 2, label: 'Di' },
-  { value: 3, label: 'Mi' },
-  { value: 4, label: 'Do' },
-  { value: 5, label: 'Fr' },
-  { value: 6, label: 'Sa' },
-  { value: 0, label: 'So' },
-];
-
 export default function TaskEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isNew = !id || id === 'new';
 
   const [loading, setLoading] = useState(!isNew);
@@ -49,17 +41,26 @@ export default function TaskEditPage() {
   const [tags, setTags] = useState('');
   const [color, setColor] = useState<string | null>(null);
 
-  // Predefined colors for quick selection
+  const WEEKDAYS = [
+    { value: 1, label: t('weekdays.short.mo') },
+    { value: 2, label: t('weekdays.short.tu') },
+    { value: 3, label: t('weekdays.short.we') },
+    { value: 4, label: t('weekdays.short.th') },
+    { value: 5, label: t('weekdays.short.fr') },
+    { value: 6, label: t('weekdays.short.sa') },
+    { value: 0, label: t('weekdays.short.su') },
+  ];
+
   const PRESET_COLORS = [
-    { value: '#EF4444', label: 'Rot' },
-    { value: '#F97316', label: 'Orange' },
-    { value: '#EAB308', label: 'Gelb' },
-    { value: '#22C55E', label: 'Gr\u00fcn' },
-    { value: '#14B8A6', label: 'T\u00fcrkis' },
-    { value: '#3B82F6', label: 'Blau' },
-    { value: '#8B5CF6', label: 'Violett' },
-    { value: '#EC4899', label: 'Pink' },
-    { value: '#6B7280', label: 'Grau' },
+    { value: '#EF4444', label: t('colors.red') },
+    { value: '#F97316', label: t('colors.orange') },
+    { value: '#EAB308', label: t('colors.yellow') },
+    { value: '#22C55E', label: t('colors.green') },
+    { value: '#14B8A6', label: t('colors.teal') },
+    { value: '#3B82F6', label: t('colors.blue') },
+    { value: '#8B5CF6', label: t('colors.violet') },
+    { value: '#EC4899', label: t('colors.pink') },
+    { value: '#6B7280', label: t('colors.gray') },
   ];
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export default function TaskEditPage() {
       setColor(template.color || null);
     } catch (error) {
       console.error('Failed to load template:', error);
-      setError('Aufgabe konnte nicht geladen werden');
+      setError(t('tasks.loadError'));
     } finally {
       setLoading(false);
     }
@@ -146,14 +147,14 @@ export default function TaskEditPage() {
       navigate('/tasks');
     } catch (error) {
       console.error('Failed to save template:', error);
-      setError(error instanceof Error ? error.message : 'Speichern fehlgeschlagen');
+      setError(error instanceof Error ? error.message : t('tasks.saveError'));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Aufgabe wirklich dauerhaft löschen?')) return;
+    if (!confirm(t('tasks.deleteConfirm'))) return;
 
     try {
       await templatesApi.delete(id!, true);
@@ -192,58 +193,58 @@ export default function TaskEditPage() {
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-bold text-gray-900">
-          {isNew ? 'Neue Aufgabe' : 'Aufgabe bearbeiten'}
+          {isNew ? t('tasks.newTask') : t('tasks.editTask')}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
         <div className="card p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">Grunddaten</h2>
+          <h2 className="font-semibold text-gray-900">{t('tasks.form.basicInfo')}</h2>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Titel *
+              {t('tasks.form.titleRequired')}
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="input"
-              placeholder="z.B. Müll rausbringen"
+              placeholder={t('tasks.form.titlePlaceholder')}
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notizen
+              {t('tasks.form.notes')}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="input"
               rows={3}
-              placeholder="Optionale Notizen..."
+              placeholder={t('tasks.form.notesPlaceholder')}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tags
+              {t('tasks.form.tags')}
             </label>
             <input
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className="input"
-              placeholder="z.B. Haushalt, Wichtig"
+              placeholder={t('tasks.form.tagsPlaceholder')}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Farbe
+              {t('tasks.form.color')}
             </label>
             <div className="flex flex-wrap gap-2 items-center">
               {/* No color option */}
@@ -256,9 +257,9 @@ export default function TaskEditPage() {
                     ? 'border-gray-900 ring-2 ring-gray-400'
                     : 'border-gray-300 hover:border-gray-400'
                 )}
-                title="Keine Farbe"
+                title={t('tasks.form.noColor')}
               >
-                <span className="text-gray-400 text-xs">–</span>
+                <span className="text-gray-400 text-xs">-</span>
               </button>
               {/* Preset colors */}
               {PRESET_COLORS.map((preset) => (
@@ -283,7 +284,7 @@ export default function TaskEditPage() {
                   value={color || '#3B82F6'}
                   onChange={(e) => setColor(e.target.value)}
                   className="absolute inset-0 w-8 h-8 opacity-0 cursor-pointer"
-                  title="Eigene Farbe wählen"
+                  title={t('tasks.form.customColor')}
                 />
                 <div
                   className={cn(
@@ -295,7 +296,7 @@ export default function TaskEditPage() {
                   style={{
                     backgroundColor: color && !PRESET_COLORS.some(p => p.value === color) ? color : 'white'
                   }}
-                  title="Eigene Farbe wählen"
+                  title={t('tasks.form.customColor')}
                 >
                   {(!color || PRESET_COLORS.some(p => p.value === color)) && (
                     <span className="text-gray-400 text-xs">+</span>
@@ -308,31 +309,31 @@ export default function TaskEditPage() {
 
         {/* Schedule */}
         <div className="card p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">Wiederholung</h2>
+          <h2 className="font-semibold text-gray-900">{t('tasks.schedule.title')}</h2>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Wiederholungsart *
+              {t('tasks.schedule.typeLabel')}
             </label>
             <select
               value={scheduleType}
               onChange={(e) => setScheduleType(e.target.value as ScheduleType)}
               className="input"
             >
-              <option value="ONCE">Einmalig</option>
-              <option value="DAILY">Täglich</option>
-              <option value="WEEKLY">Wöchentlich</option>
-              <option value="MONTHLY">Monatlich</option>
-              <option value="YEARLY">Jährlich</option>
-              <option value="INTERVAL">Alle X Tage/Wochen/...</option>
+              <option value="ONCE">{t('tasks.schedule.once')}</option>
+              <option value="DAILY">{t('tasks.schedule.daily')}</option>
+              <option value="WEEKLY">{t('tasks.schedule.weekly')}</option>
+              <option value="MONTHLY">{t('tasks.schedule.monthly')}</option>
+              <option value="YEARLY">{t('tasks.schedule.yearly')}</option>
+              <option value="INTERVAL">{t('tasks.schedule.interval')}</option>
             </select>
           </div>
 
-          {/* Start Date - für alle Typen außer ONCE */}
+          {/* Start Date - for all types except ONCE */}
           {scheduleType !== 'ONCE' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gültig ab (optional)
+                {t('tasks.schedule.startDate')}
               </label>
               <input
                 type="date"
@@ -341,7 +342,7 @@ export default function TaskEditPage() {
                 className="input"
               />
               <p className="text-sm text-gray-500 mt-1">
-                Leer = ab heute. Setze ein Datum, um die Aufgabe erst später oder rückwirkend zu starten.
+                {t('tasks.schedule.startDateHint')}
               </p>
             </div>
           )}
@@ -350,7 +351,7 @@ export default function TaskEditPage() {
           {scheduleType === 'ONCE' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Datum *
+                {t('tasks.schedule.date')}
               </label>
               <input
                 type="date"
@@ -366,7 +367,7 @@ export default function TaskEditPage() {
           {scheduleType === 'WEEKLY' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Wochentage *
+                {t('tasks.schedule.weekdays')}
               </label>
               <div className="flex flex-wrap gap-2">
                 {WEEKDAYS.map(({ value, label }) => (
@@ -393,23 +394,23 @@ export default function TaskEditPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Modus
+                  {t('tasks.schedule.monthlyMode')}
                 </label>
                 <select
                   value={monthlyMode}
                   onChange={(e) => setMonthlyMode(e.target.value as MonthlyMode)}
                   className="input"
                 >
-                  <option value="SPECIFIC_DAY">Bestimmter Tag</option>
-                  <option value="FIRST_DAY">Erster Tag des Monats</option>
-                  <option value="LAST_DAY">Letzter Tag des Monats</option>
+                  <option value="SPECIFIC_DAY">{t('tasks.schedule.monthlySpecificDay')}</option>
+                  <option value="FIRST_DAY">{t('tasks.schedule.monthlyFirstDay')}</option>
+                  <option value="LAST_DAY">{t('tasks.schedule.monthlyLastDay')}</option>
                 </select>
               </div>
 
               {monthlyMode === 'SPECIFIC_DAY' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tag im Monat
+                    {t('tasks.schedule.monthlyDayOfMonth')}
                   </label>
                   <input
                     type="number"
@@ -429,7 +430,7 @@ export default function TaskEditPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tag
+                  {t('tasks.schedule.yearlyDay')}
                 </label>
                 <input
                   type="number"
@@ -442,25 +443,25 @@ export default function TaskEditPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monat
+                  {t('tasks.schedule.yearlyMonth')}
                 </label>
                 <select
                   value={yearlyMonth}
                   onChange={(e) => setYearlyMonth(parseInt(e.target.value))}
                   className="input"
                 >
-                  <option value={1}>Januar</option>
-                  <option value={2}>Februar</option>
-                  <option value={3}>März</option>
-                  <option value={4}>April</option>
-                  <option value={5}>Mai</option>
-                  <option value={6}>Juni</option>
-                  <option value={7}>Juli</option>
-                  <option value={8}>August</option>
-                  <option value={9}>September</option>
-                  <option value={10}>Oktober</option>
-                  <option value={11}>November</option>
-                  <option value={12}>Dezember</option>
+                  <option value={1}>{t('months.january')}</option>
+                  <option value={2}>{t('months.february')}</option>
+                  <option value={3}>{t('months.march')}</option>
+                  <option value={4}>{t('months.april')}</option>
+                  <option value={5}>{t('months.may')}</option>
+                  <option value={6}>{t('months.june')}</option>
+                  <option value={7}>{t('months.july')}</option>
+                  <option value={8}>{t('months.august')}</option>
+                  <option value={9}>{t('months.september')}</option>
+                  <option value={10}>{t('months.october')}</option>
+                  <option value={11}>{t('months.november')}</option>
+                  <option value={12}>{t('months.december')}</option>
                 </select>
               </div>
             </div>
@@ -472,7 +473,7 @@ export default function TaskEditPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Alle
+                    {t('tasks.schedule.intervalEvery')}
                   </label>
                   <input
                     type="number"
@@ -485,24 +486,24 @@ export default function TaskEditPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Einheit
+                    {t('tasks.schedule.intervalUnit')}
                   </label>
                   <select
                     value={intervalUnit}
                     onChange={(e) => setIntervalUnit(e.target.value as IntervalUnit)}
                     className="input"
                   >
-                    <option value="DAY">Tage</option>
-                    <option value="WEEK">Wochen</option>
-                    <option value="MONTH">Monate</option>
-                    <option value="YEAR">Jahre</option>
+                    <option value="DAY">{t('tasks.schedule.intervalDays')}</option>
+                    <option value="WEEK">{t('tasks.schedule.intervalWeeks')}</option>
+                    <option value="MONTH">{t('tasks.schedule.intervalMonths')}</option>
+                    <option value="YEAR">{t('tasks.schedule.intervalYears')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Startdatum (Anker)
+                  {t('tasks.schedule.intervalAnchor')}
                 </label>
                 <input
                   type="date"
@@ -511,7 +512,7 @@ export default function TaskEditPage() {
                   className="input"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  Das Intervall wird ab diesem Datum berechnet. Für "Woche A/B" wähle hier den Beginn von Woche A und setze Intervall auf 2 Wochen.
+                  {t('tasks.schedule.intervalHint')}
                 </p>
               </div>
             </div>
@@ -520,7 +521,7 @@ export default function TaskEditPage() {
           {/* Due Time */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fällig um (optional)
+              {t('tasks.schedule.dueTime')}
             </label>
             <input
               type="time"
@@ -533,7 +534,7 @@ export default function TaskEditPage() {
 
         {/* Behavior */}
         <div className="card p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900">Verhalten bei Verpassen</h2>
+          <h2 className="font-semibold text-gray-900">{t('tasks.behavior.title')}</h2>
 
           <div className="space-y-3">
             <label className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors">
@@ -546,9 +547,9 @@ export default function TaskEditPage() {
                 className="mt-1"
               />
               <div>
-                <div className="font-medium text-gray-900">Stapelt sich auf</div>
+                <div className="font-medium text-gray-900">{t('tasks.behavior.carryOver')}</div>
                 <div className="text-sm text-gray-500">
-                  Verpasste Aufgaben bleiben offen und werden als "überfällig" angezeigt
+                  {t('tasks.behavior.carryOverDesc')}
                 </div>
               </div>
             </label>
@@ -563,9 +564,9 @@ export default function TaskEditPage() {
                 className="mt-1"
               />
               <div>
-                <div className="font-medium text-gray-900">Fehlschlag bei Verpassen</div>
+                <div className="font-medium text-gray-900">{t('tasks.behavior.failOnMiss')}</div>
                 <div className="text-sm text-gray-500">
-                  Verpasste Aufgaben werden als "fehlgeschlagen" markiert und können nicht mehr erledigt werden
+                  {t('tasks.behavior.failOnMissDesc')}
                 </div>
               </div>
             </label>
@@ -588,7 +589,7 @@ export default function TaskEditPage() {
               className="btn btn-danger flex items-center gap-2"
             >
               <Trash2 size={20} />
-              <span>Löschen</span>
+              <span>{t('common.delete')}</span>
             </button>
           )}
 
@@ -598,7 +599,7 @@ export default function TaskEditPage() {
               onClick={() => navigate(-1)}
               className="btn btn-secondary"
             >
-              Abbrechen
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -606,7 +607,7 @@ export default function TaskEditPage() {
               className="btn btn-primary flex items-center gap-2"
             >
               <Save size={20} />
-              <span>{saving ? 'Speichern...' : 'Speichern'}</span>
+              <span>{saving ? t('common.saving') : t('common.save')}</span>
             </button>
           </div>
         </div>

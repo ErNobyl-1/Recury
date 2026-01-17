@@ -4,12 +4,14 @@ import { Plus, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { instances as instancesApi, DashboardData } from '../lib/api';
 import TaskCard from '../components/TaskCard';
 import { cn } from '../lib/utils';
+import { useTranslation } from '../i18n';
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const loadData = useCallback(async () => {
     try {
@@ -18,11 +20,11 @@ export default function DashboardPage() {
       setData(dashboard);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Laden');
+      setError(err instanceof Error ? err.message : t('dashboard.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -46,7 +48,7 @@ export default function DashboardPage() {
         <AlertTriangle className="mx-auto text-red-500 mb-2" size={32} />
         <p className="text-red-600">{error}</p>
         <button onClick={loadData} className="btn btn-primary mt-4">
-          Erneut versuchen
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -63,13 +65,13 @@ export default function DashboardPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
         <div className="flex gap-2">
           <button
             onClick={loadData}
             disabled={loading}
             className="btn btn-secondary p-2"
-            title="Aktualisieren"
+            title={t('common.refresh')}
           >
             <RefreshCw size={20} className={cn(loading && 'animate-spin')} />
           </button>
@@ -78,7 +80,7 @@ export default function DashboardPage() {
             className="btn btn-primary flex items-center gap-2"
           >
             <Plus size={20} />
-            <span className="hidden sm:inline">Neue Aufgabe</span>
+            <span className="hidden sm:inline">{t('nav.newTask')}</span>
           </button>
         </div>
       </div>
@@ -87,36 +89,36 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-primary-600">{totalTodayOpen}</div>
-          <div className="text-sm text-gray-500">Offen heute</div>
+          <div className="text-sm text-gray-500">{t('dashboard.openToday')}</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-green-600">{totalTodayDone}</div>
-          <div className="text-sm text-gray-500">Erledigt</div>
+          <div className="text-sm text-gray-500">{t('dashboard.done')}</div>
         </div>
         <div className="card p-4 text-center">
           <div className={cn('text-2xl font-bold', totalOverdue > 0 ? 'text-yellow-600' : 'text-gray-400')}>
             {totalOverdue}
           </div>
-          <div className="text-sm text-gray-500">Überfällig</div>
+          <div className="text-sm text-gray-500">{t('dashboard.overdue')}</div>
         </div>
         <div className="card p-4 text-center">
           <div className={cn('text-2xl font-bold', totalFailed > 0 ? 'text-red-600' : 'text-gray-400')}>
             {totalFailed}
           </div>
-          <div className="text-sm text-gray-500">Fehlgeschlagen</div>
+          <div className="text-sm text-gray-500">{t('dashboard.failed')}</div>
         </div>
       </div>
 
       {/* Heute */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Heute</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('dashboard.today')}</h2>
 
         {/* Overdue */}
         {data.today.overdue.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-2 text-yellow-700 mb-2">
               <AlertTriangle size={16} />
-              <span className="text-sm font-medium">Überfällig ({data.today.overdue.length})</span>
+              <span className="text-sm font-medium">{t('dashboard.overdueCount', { count: data.today.overdue.length })}</span>
             </div>
             <div className="space-y-2">
               {data.today.overdue.map((instance) => (
@@ -153,7 +155,7 @@ export default function DashboardPage() {
           <div className="mb-4">
             <div className="flex items-center gap-2 text-red-700 mb-2">
               <AlertTriangle size={16} />
-              <span className="text-sm font-medium">Fehlgeschlagen ({data.today.failed.length})</span>
+              <span className="text-sm font-medium">{t('dashboard.failedCount', { count: data.today.failed.length })}</span>
             </div>
             <div className="space-y-2">
               {data.today.failed.map((instance) => (
@@ -173,7 +175,7 @@ export default function DashboardPage() {
           <div className="mt-6">
             <div className="flex items-center gap-2 text-green-700 mb-2">
               <CheckCircle2 size={16} />
-              <span className="text-sm font-medium">Erledigt ({data.today.done.length})</span>
+              <span className="text-sm font-medium">{t('dashboard.doneCount', { count: data.today.done.length })}</span>
             </div>
             <div className="space-y-2">
               {data.today.done.map((instance) => (
@@ -191,12 +193,12 @@ export default function DashboardPage() {
         {/* Empty state */}
         {totalTodayOpen === 0 && totalTodayDone === 0 && totalFailed === 0 && (
           <div className="card p-8 text-center text-gray-500">
-            <p>Keine Aufgaben für heute.</p>
+            <p>{t('dashboard.noTasksToday')}</p>
             <button
               onClick={() => navigate('/tasks/new')}
               className="btn btn-primary mt-4"
             >
-              Erste Aufgabe erstellen
+              {t('dashboard.createFirstTask')}
             </button>
           </div>
         )}
@@ -204,7 +206,7 @@ export default function DashboardPage() {
 
       {/* Morgen */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Morgen</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('dashboard.tomorrow')}</h2>
 
         {data.tomorrow.open.length > 0 ? (
           <div className="space-y-2">
@@ -219,7 +221,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="card p-6 text-center text-gray-500">
-            <p>Keine Aufgaben für morgen geplant.</p>
+            <p>{t('dashboard.noTasksTomorrow')}</p>
           </div>
         )}
       </section>

@@ -10,8 +10,8 @@ const BaseTemplateSchema = z.object({
   notes: z.string().max(2000).optional().nullable(),
   carryPolicy: CarryPolicySchema.default('CARRY_OVER_STACK'),
   scheduleType: ScheduleTypeSchema,
-  startDate: z.string().datetime().optional().nullable(), // Ab wann gilt die Aufgabe (default: heute)
-  anchorDate: z.string().datetime().optional().nullable(), // ISO string für INTERVAL
+  startDate: z.string().datetime().optional().nullable(), // When the task becomes active (default: today)
+  anchorDate: z.string().datetime().optional().nullable(), // ISO string for INTERVAL
   intervalUnit: IntervalUnitSchema.optional().nullable(),
   intervalValue: z.number().int().min(1).max(365).optional().nullable(),
   weeklyDays: z.string().regex(/^[0-6](,[0-6])*$/).optional().nullable(), // "0,1,2" format

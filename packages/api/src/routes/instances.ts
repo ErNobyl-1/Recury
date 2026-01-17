@@ -5,7 +5,7 @@ import { getToday, toUTC, toZoned, formatDateKey } from '../lib/scheduler.js';
 import { startOfDay, parseISO, addDays } from 'date-fns';
 
 export async function instanceRoutes(fastify: FastifyInstance) {
-  // Get dashboard data (heute/morgen)
+  // Get dashboard data (today/tomorrow)
   fastify.get('/dashboard', async (request: FastifyRequest, reply: FastifyReply) => {
     const data = await getDashboardData();
     return data;
