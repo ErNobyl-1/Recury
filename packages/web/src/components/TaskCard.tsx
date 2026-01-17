@@ -1,7 +1,9 @@
 import { Check, Clock, AlertCircle, ChevronRight, MoreVertical, Trash2, Edit3 } from 'lucide-react';
 import { useState } from 'react';
 import { Instance, instances as instancesApi } from '../lib/api';
-import { formatDate, formatTime, isOverdue, cn } from '../lib/utils';
+import { formatTime, isOverdue, cn } from '../lib/utils';
+import { useTranslation } from '../i18n';
+import { format, parseISO } from 'date-fns';
 
 interface TaskCardProps {
   instance: Instance;
@@ -22,6 +24,7 @@ export default function TaskCard({
 }: TaskCardProps) {
   const [loading, setLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const { t, dateFnsLocale } = useTranslation();
 
   const isTaskOverdue = instance.status === 'OPEN' && isOverdue(instance.date);
   const isDone = instance.status === 'DONE';
@@ -92,6 +95,11 @@ export default function TaskCard({
   const displayNotes = instance.customNotes || instance.template.notes;
   const hasCustomization = instance.customTitle || instance.customNotes;
 
+  const formatDateDisplay = (dateStr: string): string => {
+    const date = parseISO(dateStr);
+    return format(date, 'dd.MM.yyyy', { locale: dateFnsLocale });
+  };
+
   return (
     <div
       className={cn(
@@ -123,24 +131,24 @@ export default function TaskCard({
             {displayTitle}
           </span>
           {hasCustomization && (
-            <span title="Angepasster Termin">
+            <span title={t('taskCard.customized')}>
               <Edit3 size={12} className="text-blue-500 flex-shrink-0" />
             </span>
           )}
           {isTaskOverdue && (
-            <span className="badge badge-overdue flex-shrink-0">Ueberfaellig</span>
+            <span className="badge badge-overdue flex-shrink-0">{t('tasks.badges.overdue')}</span>
           )}
           {isFailed && (
-            <span className="badge badge-failed flex-shrink-0">Fehlgeschlagen</span>
+            <span className="badge badge-failed flex-shrink-0">{t('tasks.badges.failed')}</span>
           )}
           {instance.template.carryPolicy === 'CARRY_OVER_STACK' && isTaskOverdue && (
-            <span className="badge badge-carry flex-shrink-0">Stapelt</span>
+            <span className="badge badge-carry flex-shrink-0">{t('tasks.badges.stacks')}</span>
           )}
         </div>
 
         <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
           {showDate && (
-            <span>{formatDate(instance.date)}</span>
+            <span>{formatDateDisplay(instance.date)}</span>
           )}
           {instance.template.dueTime && (
             <span className="flex items-center gap-1">
@@ -185,7 +193,7 @@ export default function TaskCard({
                     }}
                     className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors"
                   >
-                    Auf morgen schieben
+                    {t('taskCard.snoozeToTomorrow')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -195,13 +203,13 @@ export default function TaskCard({
                     }}
                     className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors"
                   >
-                    Diesen Termin bearbeiten
+                    {t('taskCard.editThisInstance')}
                   </button>
                   <hr className="my-1 border-gray-200" />
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm('Diesen Termin wirklich loeschen?')) {
+                      if (confirm(t('taskCard.deleteInstanceConfirm'))) {
                         handleDelete();
                       } else {
                         setShowMenu(false);
@@ -210,7 +218,7 @@ export default function TaskCard({
                     className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                   >
                     <Trash2 size={14} />
-                    Termin loeschen
+                    {t('taskCard.deleteInstance')}
                   </button>
                 </div>
               </>

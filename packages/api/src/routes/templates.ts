@@ -151,18 +151,18 @@ export async function templateRoutes(fastify: FastifyInstance) {
     if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
-    // Check if schedule-relevant fields changed
+    // Check if schedule-relevant fields actually changed (compare against existing values)
     const scheduleFieldsChanged =
-      data.scheduleType !== undefined ||
-      data.startDate !== undefined ||
-      data.anchorDate !== undefined ||
-      data.intervalUnit !== undefined ||
-      data.intervalValue !== undefined ||
-      data.weeklyDays !== undefined ||
-      data.monthlyDay !== undefined ||
-      data.monthlyMode !== undefined ||
-      data.yearlyMonth !== undefined ||
-      data.yearlyDay !== undefined;
+      (data.scheduleType !== undefined && data.scheduleType !== existing.scheduleType) ||
+      (data.startDate !== undefined && data.startDate !== (existing.startDate?.toISOString().split('T')[0] ?? null)) ||
+      (data.anchorDate !== undefined && data.anchorDate !== (existing.anchorDate?.toISOString().split('T')[0] ?? null)) ||
+      (data.intervalUnit !== undefined && data.intervalUnit !== existing.intervalUnit) ||
+      (data.intervalValue !== undefined && data.intervalValue !== existing.intervalValue) ||
+      (data.weeklyDays !== undefined && data.weeklyDays !== existing.weeklyDays) ||
+      (data.monthlyDay !== undefined && data.monthlyDay !== existing.monthlyDay) ||
+      (data.monthlyMode !== undefined && data.monthlyMode !== existing.monthlyMode) ||
+      (data.yearlyMonth !== undefined && data.yearlyMonth !== existing.yearlyMonth) ||
+      (data.yearlyDay !== undefined && data.yearlyDay !== existing.yearlyDay);
 
     const template = await prisma.taskTemplate.update({
       where: { id },

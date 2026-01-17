@@ -28,8 +28,10 @@ RUN npx prisma generate
 # Build API (TypeScript compilation)
 RUN npx tsc
 
-# Build Web
+# Build Web (pass build-time args)
 WORKDIR /app/packages/web
+ARG VITE_DEFAULT_LOCALE=en
+ENV VITE_DEFAULT_LOCALE=$VITE_DEFAULT_LOCALE
 RUN npm run build
 
 # Stage 2: Production

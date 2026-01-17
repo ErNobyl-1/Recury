@@ -1,0 +1,275 @@
+# German translations
+
+app:
+  name: "Recury"
+  tagline: "Aufgaben, die an dich denken."
+  version: "Version 1.0.0"
+
+nav:
+  dashboard: "Dashboard"
+  calendar: "Kalender"
+  tasks: "Aufgaben"
+  settings: "Einstellungen"
+  newTask: "Neue Aufgabe"
+
+common:
+  save: "Speichern"
+  saving: "Speichern..."
+  cancel: "Abbrechen"
+  delete: "Löschen"
+  loading: "Laden..."
+  error: "Fehler"
+  refresh: "Aktualisieren"
+  search: "Suchen..."
+  edit: "Bearbeiten"
+  close: "Schließen"
+  yes: "Ja"
+  no: "Nein"
+  retry: "Erneut versuchen"
+  back: "Zurück"
+
+auth:
+  password: "Passwort"
+  passwordPlaceholder: "Passwort eingeben"
+  login: "Anmelden"
+  loggingIn: "Anmelden..."
+  logout: "Abmelden"
+  loginFailed: "Anmeldung fehlgeschlagen"
+  wrongPassword: "Falsches Passwort"
+
+dashboard:
+  title: "Dashboard"
+  openToday: "Offen heute"
+  done: "Erledigt"
+  overdue: "Überfällig"
+  failed: "Fehlgeschlagen"
+  overdueCount: "Überfällig ({count})"
+  failedCount: "Fehlgeschlagen ({count})"
+  doneCount: "Erledigt ({count})"
+  today: "Heute"
+  tomorrow: "Morgen"
+  noTasksToday: "Keine Aufgaben für heute."
+  noTasksTomorrow: "Keine Aufgaben für morgen geplant."
+  createFirstTask: "Erste Aufgabe erstellen"
+  loadError: "Fehler beim Laden"
+
+calendar:
+  title: "Kalender"
+  todayButton: "Heute"
+  openCount: "Offen ({count})"
+  doneCount: "Erledigt ({count})"
+  failedCount: "Fehlgeschlagen ({count})"
+  noTasksThisDay: "Keine Aufgaben an diesem Tag."
+  doneTooltip: "{count} erledigt"
+  failedTooltip: "{count} fehlgeschlagen"
+
+tasks:
+  title: "Aufgaben"
+  newTask: "Neue Aufgabe"
+  editTask: "Aufgabe bearbeiten"
+  noTasksFound: "Keine Aufgaben gefunden."
+  createFirst: "Erste Aufgabe erstellen"
+  deleteConfirm: "Aufgabe wirklich dauerhaft löschen?"
+  deleteConfirmWithInstances: "Aufgabe wirklich dauerhaft löschen? Alle Instanzen werden ebenfalls gelöscht."
+  loadError: "Aufgabe konnte nicht geladen werden"
+  saveError: "Speichern fehlgeschlagen"
+
+  filters:
+    active: "Aktiv"
+    archived: "Archiviert"
+    all: "Alle"
+    allTypes: "Alle Typen"
+
+  actions:
+    duplicate: "Duplizieren"
+    archive: "Archivieren"
+    restore: "Wiederherstellen"
+    deletePermanent: "Endgültig löschen"
+
+  badges:
+    archived: "Archiviert"
+    overdue: "Überfällig"
+    failed: "Fehlgeschlagen"
+    stacks: "Stapelt"
+    fails: "Failt"
+
+  form:
+    basicInfo: "Grunddaten"
+    titleLabel: "Titel"
+    titlePlaceholder: "z.B. Müll rausbringen"
+    titleRequired: "Titel *"
+    notes: "Notizen"
+    notesPlaceholder: "Optionale Notizen..."
+    tags: "Tags"
+    tagsPlaceholder: "z.B. Haushalt, Wichtig"
+    color: "Farbe"
+    noColor: "Keine Farbe"
+    customColor: "Eigene Farbe wählen"
+
+  schedule:
+    title: "Wiederholung"
+    typeLabel: "Wiederholungsart *"
+    once: "Einmalig"
+    daily: "Täglich"
+    weekly: "Wöchentlich"
+    monthly: "Monatlich"
+    yearly: "Jährlich"
+    interval: "Alle X Tage/Wochen/..."
+
+    startDate: "Gültig ab (optional)"
+    startDateHint: "Leer = ab heute. Setze ein Datum, um die Aufgabe erst später oder rückwirkend zu starten."
+    date: "Datum *"
+    weekdays: "Wochentage *"
+
+    monthlyMode: "Modus"
+    monthlySpecificDay: "Bestimmter Tag"
+    monthlyFirstDay: "Erster Tag des Monats"
+    monthlyLastDay: "Letzter Tag des Monats"
+    monthlyDayOfMonth: "Tag im Monat"
+
+    yearlyDay: "Tag"
+    yearlyMonth: "Monat"
+
+    intervalEvery: "Alle"
+    intervalUnit: "Einheit"
+    intervalDays: "Tage"
+    intervalWeeks: "Wochen"
+    intervalMonths: "Monate"
+    intervalYears: "Jahre"
+    intervalAnchor: "Startdatum (Anker)"
+    intervalHint: "Das Intervall wird ab diesem Datum berechnet. Für \"Woche A/B\" wähle hier den Beginn von Woche A und setze Intervall auf 2 Wochen."
+
+    dueTime: "Fällig um (optional)"
+
+  behavior:
+    title: "Verhalten bei Verpassen"
+    carryOver: "Stapelt sich auf"
+    carryOverDesc: "Verpasste Aufgaben bleiben offen und werden als 'überfällig' angezeigt"
+    failOnMiss: "Fehlschlag bei Verpassen"
+    failOnMissDesc: "Verpasste Aufgaben werden als 'fehlgeschlagen' markiert und können nicht mehr erledigt werden"
+
+weekdays:
+  short:
+    mo: "Mo"
+    tu: "Di"
+    we: "Mi"
+    th: "Do"
+    fr: "Fr"
+    sa: "Sa"
+    su: "So"
+
+months:
+  january: "Januar"
+  february: "Februar"
+  march: "März"
+  april: "April"
+  may: "Mai"
+  june: "Juni"
+  july: "Juli"
+  august: "August"
+  september: "September"
+  october: "Oktober"
+  november: "November"
+  december: "Dezember"
+
+colors:
+  red: "Rot"
+  orange: "Orange"
+  yellow: "Gelb"
+  green: "Grün"
+  teal: "Türkis"
+  blue: "Blau"
+  violet: "Violett"
+  pink: "Pink"
+  gray: "Grau"
+
+taskCard:
+  customized: "Angepasster Termin"
+  snoozeToTomorrow: "Auf morgen schieben"
+  editThisInstance: "Diesen Termin bearbeiten"
+  deleteInstance: "Termin löschen"
+  deleteInstanceConfirm: "Diesen Termin wirklich löschen?"
+
+instanceModal:
+  title: "Termin bearbeiten"
+  infoBox: "Hier kannst du nur diesen einzelnen Termin bearbeiten. Die Vorlage und alle anderen Termine bleiben unverändert."
+  customTitle: "Titel (nur für diesen Termin)"
+  customNotes: "Notizen (nur für diesen Termin)"
+  noNotes: "Keine Notizen"
+  original: "Original: {text}"
+  moveDate: "Datum verschieben"
+  deleteThis: "Diesen Termin löschen"
+  deleteConfirm: "Diesen Termin wirklich löschen? Die Aufgabe wird an diesem Tag nicht mehr angezeigt."
+  saveThis: "Diesen Termin speichern"
+  editTemplate: "Alle Termine bearbeiten (Vorlage öffnen)"
+  saveError: "Fehler beim Speichern"
+  deleteError: "Fehler beim Löschen"
+  yesDelete: "Ja, löschen"
+
+settings:
+  title: "Einstellungen"
+
+  language:
+    title: "Sprache"
+    german: "Deutsch"
+    english: "English"
+
+  password:
+    title: "Passwort ändern"
+    current: "Aktuelles Passwort"
+    new: "Neues Passwort"
+    confirm: "Passwort bestätigen"
+    change: "Passwort ändern"
+    changing: "Ändern..."
+    mismatch: "Passwörter stimmen nicht überein"
+    tooShort: "Passwort muss mindestens 4 Zeichen lang sein"
+    success: "Passwort erfolgreich geändert"
+    error: "Fehler beim Ändern des Passworts"
+
+  security:
+    title: "Sicherheitshinweise"
+    hint1: "Diese App ist für den Betrieb im lokalen Netzwerk oder per VPN gedacht"
+    hint2: "Verwende ein sicheres Passwort, auch wenn nur du Zugriff hast"
+    hint3: "Deine Daten werden lokal auf dem Server gespeichert"
+    hint4: "Es werden keine Daten an externe Dienste übertragen"
+
+  logout:
+    title: "Abmelden"
+    description: "Beende deine aktuelle Sitzung"
+
+dates:
+  today: "Heute"
+  tomorrow: "Morgen"
+  yesterday: "Gestern"
+
+scheduleLabels:
+  once: "Einmalig"
+  daily: "Täglich"
+  weekly: "Wöchentlich"
+  monthly: "Monatlich"
+  yearly: "Jährlich"
+  interval: "Intervall"
+
+  onceWithDate: "Einmalig am {date}"
+  onceNoDate: "Einmalig (kein Datum)"
+  weeklyOn: "Wöchentlich: {days}"
+  yearlyOn: "Jährlich am {day}.{month}."
+  everyInterval: "Alle {value} {unit}"
+
+  monthlyFirst: "Am 1. des Monats"
+  monthlyLast: "Am letzten Tag des Monats"
+  monthlyDay: "Am {day}. des Monats"
+
+carryPolicy:
+  failOnMiss: "Fehlgeschlagen bei Verpassen"
+  carryOverStack: "Stapelt sich auf"
+
+intervalUnits:
+  day: "Tag"
+  day_plural: "Tage"
+  week: "Woche"
+  week_plural: "Wochen"
+  month: "Monat"
+  month_plural: "Monate"
+  year: "Jahr"
+  year_plural: "Jahre"

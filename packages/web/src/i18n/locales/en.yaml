@@ -1,0 +1,275 @@
+# English translations (default)
+
+app:
+  name: "Recury"
+  tagline: "Tasks that think of you."
+  version: "Version 1.0.0"
+
+nav:
+  dashboard: "Dashboard"
+  calendar: "Calendar"
+  tasks: "Tasks"
+  settings: "Settings"
+  newTask: "New Task"
+
+common:
+  save: "Save"
+  saving: "Saving..."
+  cancel: "Cancel"
+  delete: "Delete"
+  loading: "Loading..."
+  error: "Error"
+  refresh: "Refresh"
+  search: "Search..."
+  edit: "Edit"
+  close: "Close"
+  yes: "Yes"
+  no: "No"
+  retry: "Retry"
+  back: "Back"
+
+auth:
+  password: "Password"
+  passwordPlaceholder: "Enter password"
+  login: "Log in"
+  loggingIn: "Logging in..."
+  logout: "Log out"
+  loginFailed: "Login failed"
+  wrongPassword: "Wrong password"
+
+dashboard:
+  title: "Dashboard"
+  openToday: "Open today"
+  done: "Done"
+  overdue: "Overdue"
+  failed: "Failed"
+  overdueCount: "Overdue ({count})"
+  failedCount: "Failed ({count})"
+  doneCount: "Done ({count})"
+  today: "Today"
+  tomorrow: "Tomorrow"
+  noTasksToday: "No tasks for today."
+  noTasksTomorrow: "No tasks planned for tomorrow."
+  createFirstTask: "Create first task"
+  loadError: "Error loading"
+
+calendar:
+  title: "Calendar"
+  todayButton: "Today"
+  openCount: "Open ({count})"
+  doneCount: "Done ({count})"
+  failedCount: "Failed ({count})"
+  noTasksThisDay: "No tasks on this day."
+  doneTooltip: "{count} done"
+  failedTooltip: "{count} failed"
+
+tasks:
+  title: "Tasks"
+  newTask: "New Task"
+  editTask: "Edit Task"
+  noTasksFound: "No tasks found."
+  createFirst: "Create first task"
+  deleteConfirm: "Really delete this task permanently?"
+  deleteConfirmWithInstances: "Really delete this task permanently? All instances will also be deleted."
+  loadError: "Could not load task"
+  saveError: "Save failed"
+
+  filters:
+    active: "Active"
+    archived: "Archived"
+    all: "All"
+    allTypes: "All types"
+
+  actions:
+    duplicate: "Duplicate"
+    archive: "Archive"
+    restore: "Restore"
+    deletePermanent: "Delete permanently"
+
+  badges:
+    archived: "Archived"
+    overdue: "Overdue"
+    failed: "Failed"
+    stacks: "Stacks"
+    fails: "Fails"
+
+  form:
+    basicInfo: "Basic Info"
+    titleLabel: "Title"
+    titlePlaceholder: "e.g. Take out trash"
+    titleRequired: "Title *"
+    notes: "Notes"
+    notesPlaceholder: "Optional notes..."
+    tags: "Tags"
+    tagsPlaceholder: "e.g. Household, Important"
+    color: "Color"
+    noColor: "No color"
+    customColor: "Choose custom color"
+
+  schedule:
+    title: "Recurrence"
+    typeLabel: "Recurrence type *"
+    once: "Once"
+    daily: "Daily"
+    weekly: "Weekly"
+    monthly: "Monthly"
+    yearly: "Yearly"
+    interval: "Every X days/weeks/..."
+
+    startDate: "Valid from (optional)"
+    startDateHint: "Empty = from today. Set a date to start the task later or retroactively."
+    date: "Date *"
+    weekdays: "Weekdays *"
+
+    monthlyMode: "Mode"
+    monthlySpecificDay: "Specific day"
+    monthlyFirstDay: "First day of month"
+    monthlyLastDay: "Last day of month"
+    monthlyDayOfMonth: "Day of month"
+
+    yearlyDay: "Day"
+    yearlyMonth: "Month"
+
+    intervalEvery: "Every"
+    intervalUnit: "Unit"
+    intervalDays: "Days"
+    intervalWeeks: "Weeks"
+    intervalMonths: "Months"
+    intervalYears: "Years"
+    intervalAnchor: "Start date (anchor)"
+    intervalHint: "The interval is calculated from this date. For 'Week A/B' choose the start of Week A and set interval to 2 weeks."
+
+    dueTime: "Due at (optional)"
+
+  behavior:
+    title: "Behavior on miss"
+    carryOver: "Stacks up"
+    carryOverDesc: "Missed tasks remain open and are shown as 'overdue'"
+    failOnMiss: "Fail on miss"
+    failOnMissDesc: "Missed tasks are marked as 'failed' and can no longer be completed"
+
+weekdays:
+  short:
+    mo: "Mo"
+    tu: "Tu"
+    we: "We"
+    th: "Th"
+    fr: "Fr"
+    sa: "Sa"
+    su: "Su"
+
+months:
+  january: "January"
+  february: "February"
+  march: "March"
+  april: "April"
+  may: "May"
+  june: "June"
+  july: "July"
+  august: "August"
+  september: "September"
+  october: "October"
+  november: "November"
+  december: "December"
+
+colors:
+  red: "Red"
+  orange: "Orange"
+  yellow: "Yellow"
+  green: "Green"
+  teal: "Teal"
+  blue: "Blue"
+  violet: "Violet"
+  pink: "Pink"
+  gray: "Gray"
+
+taskCard:
+  customized: "Customized instance"
+  snoozeToTomorrow: "Snooze to tomorrow"
+  editThisInstance: "Edit this instance"
+  deleteInstance: "Delete instance"
+  deleteInstanceConfirm: "Really delete this instance?"
+
+instanceModal:
+  title: "Edit Instance"
+  infoBox: "Here you can only edit this single instance. The template and all other instances remain unchanged."
+  customTitle: "Title (only for this instance)"
+  customNotes: "Notes (only for this instance)"
+  noNotes: "No notes"
+  original: "Original: {text}"
+  moveDate: "Move date"
+  deleteThis: "Delete this instance"
+  deleteConfirm: "Really delete this instance? The task will no longer be shown on this day."
+  saveThis: "Save this instance"
+  editTemplate: "Edit all instances (open template)"
+  saveError: "Error saving"
+  deleteError: "Error deleting"
+  yesDelete: "Yes, delete"
+
+settings:
+  title: "Settings"
+
+  language:
+    title: "Language"
+    german: "Deutsch"
+    english: "English"
+
+  password:
+    title: "Change Password"
+    current: "Current password"
+    new: "New password"
+    confirm: "Confirm password"
+    change: "Change password"
+    changing: "Changing..."
+    mismatch: "Passwords do not match"
+    tooShort: "Password must be at least 4 characters"
+    success: "Password changed successfully"
+    error: "Error changing password"
+
+  security:
+    title: "Security Info"
+    hint1: "This app is intended for use in a local network or via VPN"
+    hint2: "Use a secure password, even if only you have access"
+    hint3: "Your data is stored locally on the server"
+    hint4: "No data is transmitted to external services"
+
+  logout:
+    title: "Log out"
+    description: "End your current session"
+
+dates:
+  today: "Today"
+  tomorrow: "Tomorrow"
+  yesterday: "Yesterday"
+
+scheduleLabels:
+  once: "Once"
+  daily: "Daily"
+  weekly: "Weekly"
+  monthly: "Monthly"
+  yearly: "Yearly"
+  interval: "Interval"
+
+  onceWithDate: "Once on {date}"
+  onceNoDate: "Once (no date)"
+  weeklyOn: "Weekly: {days}"
+  yearlyOn: "Yearly on {day}.{month}."
+  everyInterval: "Every {value} {unit}"
+
+  monthlyFirst: "On the 1st of the month"
+  monthlyLast: "On the last day of the month"
+  monthlyDay: "On the {day}th of the month"
+
+carryPolicy:
+  failOnMiss: "Fail on miss"
+  carryOverStack: "Stacks up"
+
+intervalUnits:
+  day: "day"
+  day_plural: "days"
+  week: "week"
+  week_plural: "weeks"
+  month: "month"
+  month_plural: "months"
+  year: "year"
+  year_plural: "years"

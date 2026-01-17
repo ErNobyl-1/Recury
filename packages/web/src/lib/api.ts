@@ -38,6 +38,22 @@ async function request<T>(
   return response.json();
 }
 
+// Settings
+export interface AppSettings {
+  locale: 'en' | 'de';
+}
+
+export const settings = {
+  get: () =>
+    request<AppSettings>('/settings'),
+
+  update: (data: Partial<AppSettings>) =>
+    request<AppSettings>('/settings', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+};
+
 // Auth
 export const auth = {
   login: (password: string) =>

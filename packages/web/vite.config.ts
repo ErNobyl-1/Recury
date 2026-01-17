@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import yaml from '@modyfi/vite-plugin-yaml';
 import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [
     react(),
+    yaml(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
@@ -20,7 +22,7 @@ export default defineConfig({
       manifest: {
         name: 'Recury',
         short_name: 'Recury',
-        description: 'Aufgaben, die an dich denken.',
+        description: 'Tasks that think of you.',
         theme_color: '#3b82f6',
         background_color: '#ffffff',
         display: 'standalone',

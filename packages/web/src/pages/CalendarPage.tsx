@@ -13,13 +13,14 @@ import {
   addMonths,
   subMonths,
   parseISO,
+  addDays,
 } from 'date-fns';
-import { de } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { instances as instancesApi, Instance } from '../lib/api';
 import TaskCard from '../components/TaskCard';
 import InstanceEditModal from '../components/InstanceEditModal';
-import { cn, formatDate } from '../lib/utils';
+import { cn } from '../lib/utils';
+import { useTranslation } from '../i18n';
 
 export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -28,12 +29,13 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
   const [editingInstance, setEditingInstance] = useState<Instance | null>(null);
   const navigate = useNavigate();
+  const { t, dateFnsLocale } = useTranslation();
 
   const loadInstances = useCallback(async () => {
     setLoading(true);
     try {
-      const start = startOfWeek(startOfMonth(currentMonth), { locale: de });
-      const end = endOfWeek(endOfMonth(addMonths(currentMonth, 1)), { locale: de });
+      const start = startOfWeek(startOfMonth(currentMonth), { locale: dateFnsLocale });
+      const end = endOfWeek(endOfMonth(addMonths(currentMonth, 1)), { locale: dateFnsLocale });
 
       const from = format(start, 'yyyy-MM-dd');
       const to = format(end, 'yyyy-MM-dd');
@@ -45,7 +47,7 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentMonth]);
+  }, [currentMonth, dateFnsLocale]);
 
   useEffect(() => {
     loadInstances();
@@ -53,8 +55,8 @@ export default function CalendarPage() {
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { locale: de });
-  const calendarEnd = endOfWeek(monthEnd, { locale: de });
+  const calendarStart = startOfWeek(monthStart, { locale: dateFnsLocale });
+  const calendarEnd = endOfWeek(monthEnd, { locale: dateFnsLocale });
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const getInstancesForDate = (date: Date): Instance[] => {
@@ -73,18 +75,24 @@ export default function CalendarPage() {
     setSelectedDate(new Date());
   };
 
-  const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  // Generate weekday headers aligned with locale's week start
+  const weekDays = (() => {
+    const weekStart = startOfWeek(new Date(), { locale: dateFnsLocale });
+    return Array.from({ length: 7 }, (_, i) =>
+      format(addDays(weekStart, i), 'EEEEEE', { locale: dateFnsLocale })
+    );
+  })();
 
   return (
     <div className="md:max-w-4xl md:mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Kalender</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">{t('calendar.title')}</h1>
         <button
           onClick={loadInstances}
           disabled={loading}
           className="btn btn-secondary p-2"
-          title="Aktualisieren"
+          title={t('common.refresh')}
         >
           <RefreshCw size={20} className={cn(loading && 'animate-spin')} />
         </button>
@@ -102,13 +110,13 @@ export default function CalendarPage() {
 
           <div className="flex items-center gap-3 md:gap-4">
             <h2 className="text-lg font-semibold">
-              {format(currentMonth, 'MMMM yyyy', { locale: de })}
+              {format(currentMonth, 'MMMM yyyy', { locale: dateFnsLocale })}
             </h2>
             <button
               onClick={handleToday}
               className="btn btn-secondary text-sm px-3 py-1"
             >
-              Heute
+              {t('calendar.todayButton')}
             </button>
           </div>
 
@@ -167,10 +175,10 @@ export default function CalendarPage() {
                   {isCurrentMonth && (doneCount > 0 || failedCount > 0) && (
                     <div className="flex gap-0.5">
                       {doneCount > 0 && (
-                        <span className="w-2 h-2 rounded-full bg-green-500" title={`${doneCount} erledigt`} />
+                        <span className="w-2 h-2 rounded-full bg-green-500" title={t('calendar.doneTooltip', { count: doneCount })} />
                       )}
                       {failedCount > 0 && (
-                        <span className="w-2 h-2 rounded-full bg-red-500" title={`${failedCount} fehlgeschlagen`} />
+                        <span className="w-2 h-2 rounded-full bg-red-500" title={t('calendar.failedTooltip', { count: failedCount })} />
                       )}
                     </div>
                   )}
@@ -183,6 +191,7 @@ export default function CalendarPage() {
                       const taskColor = instance.template?.color;
                       const defaultColor = '#6B7280'; // Gray for tasks without color
                       const displayColor = taskColor || defaultColor;
+                      const displayTitle = instance.customTitle || instance.template?.title;
                       return (
                         <div
                           key={instance.id}
@@ -192,9 +201,9 @@ export default function CalendarPage() {
                             color: displayColor,
                             borderLeft: `2px solid ${displayColor}`,
                           }}
-                          title={instance.template?.title}
+                          title={displayTitle}
                         >
-                          {instance.template?.title}
+                          {displayTitle}
                         </div>
                       );
                     })}
@@ -210,7 +219,7 @@ export default function CalendarPage() {
       {selectedDate && (
         <div className="bg-white md:card p-4 -mx-4 md:mx-0 md:rounded-lg">
           <h3 className="font-semibold text-gray-900 mb-3">
-            {formatDate(selectedDate, 'EEEE, dd. MMMM yyyy')}
+            {format(selectedDate, 'EEEE, dd. MMMM yyyy', { locale: dateFnsLocale })}
           </h3>
 
           {selectedInstances.length > 0 ? (
@@ -220,7 +229,7 @@ export default function CalendarPage() {
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-primary-500" />
-                    Offen ({selectedInstances.filter(i => i.status === 'OPEN').length})
+                    {t('calendar.openCount', { count: selectedInstances.filter(i => i.status === 'OPEN').length })}
                   </h4>
                   <div className="space-y-2">
                     {selectedInstances.filter(i => i.status === 'OPEN').map((instance) => (
@@ -242,7 +251,7 @@ export default function CalendarPage() {
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500" />
-                    Erledigt ({selectedInstances.filter(i => i.status === 'DONE').length})
+                    {t('calendar.doneCount', { count: selectedInstances.filter(i => i.status === 'DONE').length })}
                   </h4>
                   <div className="space-y-2">
                     {selectedInstances.filter(i => i.status === 'DONE').map((instance) => (
@@ -264,7 +273,7 @@ export default function CalendarPage() {
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-500" />
-                    Fehlgeschlagen ({selectedInstances.filter(i => i.status === 'FAILED').length})
+                    {t('calendar.failedCount', { count: selectedInstances.filter(i => i.status === 'FAILED').length })}
                   </h4>
                   <div className="space-y-2">
                     {selectedInstances.filter(i => i.status === 'FAILED').map((instance) => (
@@ -283,7 +292,7 @@ export default function CalendarPage() {
             </div>
           ) : (
             <p className="text-gray-500 text-center py-4">
-              Keine Aufgaben an diesem Tag.
+              {t('calendar.noTasksThisDay')}
             </p>
           )}
         </div>

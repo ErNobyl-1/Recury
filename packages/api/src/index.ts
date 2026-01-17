@@ -12,6 +12,7 @@ import { initializeAuth } from './lib/auth.js';
 import { templateRoutes } from './routes/templates.js';
 import { instanceRoutes } from './routes/instances.js';
 import { authRoutes } from './routes/auth.js';
+import { settingsRoutes } from './routes/settings.js';
 import { processFailedInstances, generateInstancesForRange } from './lib/instance-generator.js';
 import { getToday, getTomorrow } from './lib/scheduler.js';
 import { addMonths } from 'date-fns';
@@ -55,6 +56,7 @@ async function buildServer() {
     if (
       url.startsWith('/api/auth/') ||
       url === '/api/health' ||
+      url === '/api/settings' && request.method === 'GET' ||
       !url.startsWith('/api/')
     ) {
       return;
@@ -76,6 +78,7 @@ async function buildServer() {
     await api.register(authRoutes);
     await api.register(templateRoutes);
     await api.register(instanceRoutes);
+    await api.register(settingsRoutes);
   }, { prefix: '/api' });
 
   // Serve static frontend files in production

@@ -1,23 +1,25 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Calendar, ListTodo, Settings, Plus } from 'lucide-react';
 import { cn } from '../lib/utils';
-
-const navItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/calendar', icon: Calendar, label: 'Kalender' },
-  { path: '/tasks', icon: ListTodo, label: 'Aufgaben' },
-  { path: '/settings', icon: Settings, label: 'Einstellungen' },
-];
+import { useTranslation } from '../i18n';
 
 export default function Layout() {
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { path: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { path: '/calendar', icon: Calendar, label: t('nav.calendar') },
+    { path: '/tasks', icon: ListTodo, label: t('nav.tasks') },
+    { path: '/settings', icon: Settings, label: t('nav.settings') },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header - Desktop */}
       <header className="hidden md:flex bg-white border-b border-gray-200 px-6 py-4 items-center justify-between">
         <div className="flex items-center gap-8">
-          <h1 className="text-xl font-bold text-primary-600">Recury</h1>
+          <h1 className="text-xl font-bold text-primary-600">{t('app.name')}</h1>
           <nav className="flex gap-1">
             {navItems.map(({ path, icon: Icon, label }) => (
               <NavLink
@@ -43,7 +45,7 @@ export default function Layout() {
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg transition-colors"
         >
           <Plus size={20} />
-          <span>Neue Aufgabe</span>
+          <span>{t('nav.newTask')}</span>
         </NavLink>
       </header>
 
