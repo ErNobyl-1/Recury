@@ -74,7 +74,8 @@ model TaskInstance {
   // Relation
   template TaskTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
-  @@unique([templateId, date])
+  // Note: No unique constraint on templateId+date to allow stacking (multiple instances per day)
+  @@index([templateId, date])
   @@index([date])
   @@index([status])
   @@index([templateId])

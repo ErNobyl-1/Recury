@@ -152,21 +152,8 @@ export async function instanceRoutes(fastify: FastifyInstance) {
     // newDate is already a local start-of-day, convert directly to UTC
     const newDateUTC = toUTC(newDate);
 
-    // Check if an instance already exists for that date
-    const existing = await prisma.taskInstance.findUnique({
-      where: {
-        templateId_date: {
-          templateId: instance.templateId,
-          date: newDateUTC,
-        },
-      },
-    });
-
-    if (existing && existing.id !== id) {
-      return reply.status(400).send({
-        error: 'An instance already exists for this date. Complete or delete it first.',
-      });
-    }
+    // Store the original date before updating
+    const originalDateUTC = instance.date;
 
     // Update the instance date
     const updated = await prisma.taskInstance.update({
@@ -176,6 +163,29 @@ export async function instanceRoutes(fastify: FastifyInstance) {
       },
       include: { template: true },
     });
+
+    // Create a DELETED placeholder at the original date to prevent regeneration
+    // This is needed for recurring templates so the generator doesn't recreate the instance
+    if (instance.template.scheduleType !== 'ONCE') {
+      // Check if a DELETED placeholder already exists at the original date
+      const existingPlaceholder = await prisma.taskInstance.findFirst({
+        where: {
+          templateId: instance.templateId,
+          date: originalDateUTC,
+          status: 'DELETED',
+        },
+      });
+
+      if (!existingPlaceholder) {
+        await prisma.taskInstance.create({
+          data: {
+            templateId: instance.templateId,
+            date: originalDateUTC,
+            status: 'DELETED',
+          },
+        });
+      }
+    }
 
     return {
       id: updated.id,
@@ -232,34 +242,44 @@ export async function instanceRoutes(fastify: FastifyInstance) {
       try {
         const newDate = startOfDay(parseISO(date));
         const newDateUTC = toUTC(newDate);
-
-        // Check if an instance already exists for that date
-        const existing = await prisma.taskInstance.findUnique({
-          where: {
-            templateId_date: {
-              templateId: instance.templateId,
-              date: newDateUTC,
-            },
-          },
-        });
-
-        if (existing && existing.id !== id) {
-          return reply.status(400).send({
-            error: 'An instance already exists for this date.',
-          });
-        }
-
         updateData.date = newDateUTC;
       } catch {
         return reply.status(400).send({ error: 'Invalid date format. Use YYYY-MM-DD' });
       }
     }
 
+    // Store the original date before updating (for creating DELETED placeholder)
+    const originalDateUTC = instance.date;
+    const isDateChanging = updateData.date && updateData.date.getTime() !== originalDateUTC.getTime();
+
     const updated = await prisma.taskInstance.update({
       where: { id },
       data: updateData,
       include: { template: true },
     });
+
+    // Create a DELETED placeholder at the original date to prevent regeneration
+    // This is needed for recurring templates so the generator doesn't recreate the instance
+    if (isDateChanging && instance.template.scheduleType !== 'ONCE') {
+      // Check if a DELETED placeholder already exists at the original date
+      const existingPlaceholder = await prisma.taskInstance.findFirst({
+        where: {
+          templateId: instance.templateId,
+          date: originalDateUTC,
+          status: 'DELETED',
+        },
+      });
+
+      if (!existingPlaceholder) {
+        await prisma.taskInstance.create({
+          data: {
+            templateId: instance.templateId,
+            date: originalDateUTC,
+            status: 'DELETED',
+          },
+        });
+      }
+    }
 
     return {
       id: updated.id,

@@ -80,13 +80,17 @@ export async function templateRoutes(fastify: FastifyInstance) {
 
     const data = parseResult.data;
 
+    // For recurring templates, default startDate to today if not provided
+    const today = getToday();
+    const defaultStartDate = data.scheduleType !== 'ONCE' && !data.startDate ? today : null;
+
     const template = await prisma.taskTemplate.create({
       data: {
         title: data.title,
         notes: data.notes ?? null,
         carryPolicy: data.carryPolicy,
         scheduleType: data.scheduleType,
-        startDate: data.startDate ? new Date(data.startDate) : null,
+        startDate: data.startDate ? new Date(data.startDate) : defaultStartDate,
         anchorDate: data.anchorDate ? new Date(data.anchorDate) : null,
         intervalUnit: data.intervalUnit ?? null,
         intervalValue: data.intervalValue ?? null,
@@ -103,7 +107,6 @@ export async function templateRoutes(fastify: FastifyInstance) {
     });
 
     // Generate initial instances for today and next month
-    const today = getToday();
     const endDate = addMonths(today, 1);
     await generateInstancesForTemplate(template, today, endDate);
 
@@ -136,7 +139,17 @@ export async function templateRoutes(fastify: FastifyInstance) {
     if (data.notes !== undefined) updateData.notes = data.notes;
     if (data.carryPolicy !== undefined) updateData.carryPolicy = data.carryPolicy;
     if (data.scheduleType !== undefined) updateData.scheduleType = data.scheduleType;
-    if (data.startDate !== undefined) updateData.startDate = data.startDate ? new Date(data.startDate) : null;
+
+    // Handle startDate - default to today for recurring templates if not set
+    if (data.startDate !== undefined) {
+      updateData.startDate = data.startDate ? new Date(data.startDate) : null;
+    }
+    // If changing to a recurring type and no startDate is set (neither in request nor existing), default to today
+    const newScheduleType = data.scheduleType ?? existing.scheduleType;
+    const newStartDate = data.startDate !== undefined ? data.startDate : existing.startDate;
+    if (newScheduleType !== 'ONCE' && !newStartDate) {
+      updateData.startDate = getToday();
+    }
     if (data.anchorDate !== undefined) updateData.anchorDate = data.anchorDate ? new Date(data.anchorDate) : null;
     if (data.intervalUnit !== undefined) updateData.intervalUnit = data.intervalUnit;
     if (data.intervalValue !== undefined) updateData.intervalValue = data.intervalValue;

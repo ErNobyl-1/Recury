@@ -338,7 +338,7 @@ export default function TaskEditPage() {
               <input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => setStartDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
                 className="input"
               />
               <p className="text-sm text-gray-500 mt-1">
@@ -356,7 +356,7 @@ export default function TaskEditPage() {
               <input
                 type="date"
                 value={anchorDate}
-                onChange={(e) => setAnchorDate(e.target.value)}
+                onChange={(e) => setAnchorDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
                 className="input"
                 required
               />
@@ -508,7 +508,7 @@ export default function TaskEditPage() {
                 <input
                   type="date"
                   value={anchorDate}
-                  onChange={(e) => setAnchorDate(e.target.value)}
+                  onChange={(e) => setAnchorDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
                   className="input"
                 />
                 <p className="text-sm text-gray-500 mt-1">

@@ -34,16 +34,15 @@ export async function generateInstancesForTemplate(
     // Convert directly to UTC without re-truncating to avoid shifting back a day
     const dateUTC = toUTC(occurrence);
 
-    // Check if instance already exists
-    const existingInstance = await prisma.taskInstance.findUnique({
+    // Check if any instance already exists for this template+date (including DELETED placeholders)
+    const existingInstance = await prisma.taskInstance.findFirst({
       where: {
-        templateId_date: {
-          templateId: template.id,
-          date: dateUTC,
-        },
+        templateId: template.id,
+        date: dateUTC,
       },
     });
 
+    // Only create a new instance if none exists (we don't auto-generate duplicates)
     if (!existingInstance) {
       const instance = await prisma.taskInstance.create({
         data: {

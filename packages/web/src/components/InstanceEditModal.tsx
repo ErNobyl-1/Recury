@@ -153,7 +153,7 @@ export default function InstanceEditModal({
             <input
               type="date"
               value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
+              onChange={(e) => setNewDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
               className="input w-full"
             />
           </div>
