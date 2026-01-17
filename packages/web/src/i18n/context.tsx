@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { de as dateFnsDe } from 'date-fns/locale';
 import { enUS as dateFnsEn } from 'date-fns/locale';
 import enTranslations from './locales/en.yaml';
 import deTranslations from './locales/de.yaml';
 import type { Locale, LocaleContextType, TranslationFunction } from './types';
 import { interpolate, getNestedValue } from './utils';
+import { settings } from '../lib/api';
 
-const STORAGE_KEY = 'recury-locale';
 const DEFAULT_LOCALE: Locale = (import.meta.env.VITE_DEFAULT_LOCALE as Locale) || 'en';
 
 const translations: Record<Locale, Record<string, unknown>> = {
@@ -22,17 +22,31 @@ const dateFnsLocales = {
 const LocaleContext = createContext<LocaleContextType | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && (saved === 'en' || saved === 'de')) {
-      return saved;
-    }
-    return DEFAULT_LOCALE;
-  });
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch locale from API on mount
+  useEffect(() => {
+    settings.get()
+      .then((data) => {
+        if (data.locale === 'en' || data.locale === 'de') {
+          setLocaleState(data.locale);
+        }
+      })
+      .catch(() => {
+        // API error (e.g., not initialized yet), use default
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
-    localStorage.setItem(STORAGE_KEY, newLocale);
+    // Save to API (fire and forget, errors handled silently)
+    settings.update({ locale: newLocale }).catch(() => {
+      // Silently fail if not authenticated or API error
+    });
   }, []);
 
   const t: TranslationFunction = useMemo(() => {
@@ -63,6 +77,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     () => ({ locale, setLocale, t, dateFnsLocale }),
     [locale, setLocale, t, dateFnsLocale]
   );
+
+  // Show nothing while loading to prevent flash of wrong language
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <LocaleContext.Provider value={contextValue}>

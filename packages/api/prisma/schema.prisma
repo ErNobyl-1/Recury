@@ -81,6 +81,7 @@ model TaskInstance {
 }
 
 model AppSettings {
-  id       String @id @default("app")
-  password String // Hashed password
+  id       String  @id @default("app")
+  password String  // Hashed password
+  locale   String  @default("en") // Language: "en" or "de"
 }
