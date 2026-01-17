@@ -13,6 +13,7 @@ import {
   addMonths,
   subMonths,
   parseISO,
+  addDays,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { instances as instancesApi, Instance } from '../lib/api';
@@ -74,15 +75,13 @@ export default function CalendarPage() {
     setSelectedDate(new Date());
   };
 
-  const weekDays = [
-    t('weekdays.short.mo'),
-    t('weekdays.short.tu'),
-    t('weekdays.short.we'),
-    t('weekdays.short.th'),
-    t('weekdays.short.fr'),
-    t('weekdays.short.sa'),
-    t('weekdays.short.su'),
-  ];
+  // Generate weekday headers aligned with locale's week start
+  const weekDays = (() => {
+    const weekStart = startOfWeek(new Date(), { locale: dateFnsLocale });
+    return Array.from({ length: 7 }, (_, i) =>
+      format(addDays(weekStart, i), 'EEEEEE', { locale: dateFnsLocale })
+    );
+  })();
 
   return (
     <div className="md:max-w-4xl md:mx-auto space-y-4 md:space-y-6">
@@ -192,6 +191,7 @@ export default function CalendarPage() {
                       const taskColor = instance.template?.color;
                       const defaultColor = '#6B7280'; // Gray for tasks without color
                       const displayColor = taskColor || defaultColor;
+                      const displayTitle = instance.customTitle || instance.template?.title;
                       return (
                         <div
                           key={instance.id}
@@ -201,9 +201,9 @@ export default function CalendarPage() {
                             color: displayColor,
                             borderLeft: `2px solid ${displayColor}`,
                           }}
-                          title={instance.template?.title}
+                          title={displayTitle}
                         >
-                          {instance.template?.title}
+                          {displayTitle}
                         </div>
                       );
                     })}
