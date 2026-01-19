@@ -155,37 +155,39 @@ export async function instanceRoutes(fastify: FastifyInstance) {
     // Store the original date before updating
     const originalDateUTC = instance.date;
 
-    // Update the instance date
-    const updated = await prisma.taskInstance.update({
-      where: { id },
-      data: {
-        date: newDateUTC,
-      },
-      include: { template: true },
-    });
-
-    // Create a DELETED placeholder at the original date to prevent regeneration
-    // This is needed for recurring templates so the generator doesn't recreate the instance
-    if (instance.template.scheduleType !== 'ONCE') {
-      // Check if a DELETED placeholder already exists at the original date
-      const existingPlaceholder = await prisma.taskInstance.findFirst({
-        where: {
-          templateId: instance.templateId,
-          date: originalDateUTC,
-          status: 'DELETED',
-        },
-      });
-
-      if (!existingPlaceholder) {
-        await prisma.taskInstance.create({
-          data: {
+    // Use transaction to ensure atomicity - placeholder must be created before/with the move
+    const updated = await prisma.$transaction(async (tx) => {
+      // For recurring templates, create DELETED placeholder at original date FIRST
+      // This prevents the generator from recreating the instance at the original date
+      if (instance.template.scheduleType !== 'ONCE') {
+        const existingPlaceholder = await tx.taskInstance.findFirst({
+          where: {
             templateId: instance.templateId,
             date: originalDateUTC,
             status: 'DELETED',
           },
         });
+
+        if (!existingPlaceholder) {
+          await tx.taskInstance.create({
+            data: {
+              templateId: instance.templateId,
+              date: originalDateUTC,
+              status: 'DELETED',
+            },
+          });
+        }
       }
-    }
+
+      // Now update the instance date
+      return tx.taskInstance.update({
+        where: { id },
+        data: {
+          date: newDateUTC,
+        },
+        include: { template: true },
+      });
+    });
 
     return {
       id: updated.id,
@@ -252,34 +254,36 @@ export async function instanceRoutes(fastify: FastifyInstance) {
     const originalDateUTC = instance.date;
     const isDateChanging = updateData.date && updateData.date.getTime() !== originalDateUTC.getTime();
 
-    const updated = await prisma.taskInstance.update({
-      where: { id },
-      data: updateData,
-      include: { template: true },
-    });
-
-    // Create a DELETED placeholder at the original date to prevent regeneration
-    // This is needed for recurring templates so the generator doesn't recreate the instance
-    if (isDateChanging && instance.template.scheduleType !== 'ONCE') {
-      // Check if a DELETED placeholder already exists at the original date
-      const existingPlaceholder = await prisma.taskInstance.findFirst({
-        where: {
-          templateId: instance.templateId,
-          date: originalDateUTC,
-          status: 'DELETED',
-        },
-      });
-
-      if (!existingPlaceholder) {
-        await prisma.taskInstance.create({
-          data: {
+    // Use transaction to ensure atomicity - placeholder must be created before/with the move
+    const updated = await prisma.$transaction(async (tx) => {
+      // For recurring templates with date change, create DELETED placeholder at original date FIRST
+      if (isDateChanging && instance.template.scheduleType !== 'ONCE') {
+        const existingPlaceholder = await tx.taskInstance.findFirst({
+          where: {
             templateId: instance.templateId,
             date: originalDateUTC,
             status: 'DELETED',
           },
         });
+
+        if (!existingPlaceholder) {
+          await tx.taskInstance.create({
+            data: {
+              templateId: instance.templateId,
+              date: originalDateUTC,
+              status: 'DELETED',
+            },
+          });
+        }
       }
-    }
+
+      // Now update the instance
+      return tx.taskInstance.update({
+        where: { id },
+        data: updateData,
+        include: { template: true },
+      });
+    });
 
     return {
       id: updated.id,
