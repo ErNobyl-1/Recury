@@ -1,9 +1,6 @@
 services:
   recury-app:
-    build:
-      context: .
-      args:
-        VITE_DEFAULT_LOCALE: ${VITE_DEFAULT_LOCALE:-en}
+    image: ghcr.io/ernobyl-1/recury:latest
     container_name: recury
     restart: unless-stopped
     ports:

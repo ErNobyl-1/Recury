@@ -34,15 +34,21 @@ A self-hosted, privacy-first recurring task manager with intelligent scheduling 
 
 ## 🚀 Quick Start
 
-### 1. Clone & Configure
+### 1. Create Project Directory
 
 ```bash
-git clone https://github.com/ErNobyl-1/Recury.git
-cd Recury
-cp .env.example .env
+mkdir recury && cd recury
 ```
 
-### 2. Edit `.env`
+### 2. Download Configuration Files
+
+```bash
+curl -O https://raw.githubusercontent.com/ErNobyl-1/Recury/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/ErNobyl-1/Recury/main/.env.example
+mv .env.example .env
+```
+
+### 3. Edit `.env`
 
 ```env
 APP_PORT=8123
@@ -52,13 +58,13 @@ SESSION_SECRET=your-random-string     # Change this!
 
 > 💡 Generate a secure secret: `openssl rand -hex 32`
 
-### 3. Launch
+### 4. Launch
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Access
+### 5. Access
 
 Open `http://your-server:8123` and log in with your password.
 
@@ -71,14 +77,13 @@ Open `http://your-server:8123` and log in with your password.
 | `APP_PORT` | Port the app runs on | `8123` |
 | `AUTH_PASSWORD` | Login password | `changeme` |
 | `SESSION_SECRET` | Secret for secure cookies | - |
-| `VITE_DEFAULT_LOCALE` | Default language (`en` or `de`) | `en` |
 | `TZ` | Timezone | `Europe/Berlin` |
 
 ## 🔄 Updates
 
 ```bash
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 ## 🛑 Stop
