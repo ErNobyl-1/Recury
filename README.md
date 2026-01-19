@@ -99,6 +99,21 @@ Your data persists in the Docker volume.
 ## 🛠️ Development
 
 <details>
+<summary>Local Docker build</summary>
+
+```bash
+# Build and start locally
+docker compose -f docker-compose.dev.yml up -d --build
+
+# Stop
+docker compose -f docker-compose.dev.yml down
+```
+
+Uses a separate volume (`recury-data-dev`) to avoid conflicts with production data.
+
+</details>
+
+<details>
 <summary>Local development without Docker</summary>
 
 ```bash
@@ -127,7 +142,8 @@ Recury/
 ├── packages/
 │   ├── api/           # Backend (Fastify + Prisma + SQLite)
 │   └── web/           # Frontend (React + Vite + TailwindCSS)
-├── docker-compose.yml
+├── docker-compose.yml     # Production (uses GHCR image)
+├── docker-compose.dev.yml # Development (local build)
 ├── Dockerfile
 └── .env.example
 ```
